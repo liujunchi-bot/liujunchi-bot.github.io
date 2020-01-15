@@ -1,0 +1,157 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"><meta name="author" content="John Doe"><meta name="renderer" content="webkit"><meta name="copyright" content="John Doe"><meta name="keywords" content="Hexo"><meta name="description" content=""><meta name="Cache-Control" content="no-cache"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><title>快速搞定基于github的hexo主题个人博客网站 · Mr.Liu's Blog</title><link rel="stylesheet" href="/css/style.css?v=2018.7.9"><link rel="stylesheet" href="/css/animation.css?v=2018.7.9"><link rel="icon" href="/img/assets/favicon.ico"><link rel="stylesheet" href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css?version=1.5.6"><!-- scripts--><script>(function( w ){
+  "use strict";
+  // rel=preload support test
+  if( !w.loadCSS ){
+    w.loadCSS = function(){};
+  }
+  // define on the loadCSS obj
+  var rp = loadCSS.relpreload = {};
+  // rel=preload feature support test
+  // runs once and returns a function for compat purposes
+  rp.support = (function(){
+    var ret;
+    try {
+      ret = w.document.createElement( "link" ).relList.supports( "preload" );
+    } catch (e) {
+      ret = false;
+    }
+    return function(){
+      return ret;
+    };
+  })();
+
+  // if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+  // then change that media back to its intended value on load
+  rp.bindMediaToggle = function( link ){
+    // remember existing media attr for ultimate state, or default to 'all'
+    var finalMedia = link.media || "all";
+
+    function enableStylesheet(){
+      link.media = finalMedia;
+    }
+
+    // bind load handlers to enable media
+    if( link.addEventListener ){
+      link.addEventListener( "load", enableStylesheet );
+    } else if( link.attachEvent ){
+      link.attachEvent( "onload", enableStylesheet );
+    }
+
+    // Set rel and non-applicable media type to start an async request
+    // note: timeout allows this to happen async to let rendering continue in IE
+    setTimeout(function(){
+      link.rel = "stylesheet";
+      link.media = "only x";
+    });
+    // also enable media after 3 seconds,
+    // which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+    setTimeout( enableStylesheet, 3000 );
+  };
+
+  // loop through link elements in DOM
+  rp.poly = function(){
+    // double check this to prevent external calls from running
+    if( rp.support() ){
+      return;
+    }
+    var links = w.document.getElementsByTagName( "link" );
+    for( var i = 0; i < links.length; i++ ){
+      var link = links[ i ];
+      // qualify links to those with rel=preload and as=style attrs
+      if( link.rel === "preload" && link.getAttribute( "as" ) === "style" && !link.getAttribute( "data-loadcss" ) ){
+        // prevent rerunning on link
+        link.setAttribute( "data-loadcss", true );
+        // bind listeners to toggle media back
+        rp.bindMediaToggle( link );
+      }
+    }
+  };
+
+  // if unsupported, run the polyfill
+  if( !rp.support() ){
+    // run once at least
+    rp.poly();
+
+    // rerun poly on an interval until onload
+    var run = w.setInterval( rp.poly, 500 );
+    if( w.addEventListener ){
+      w.addEventListener( "load", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    } else if( w.attachEvent ){
+      w.attachEvent( "onload", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    }
+  }
+
+
+  // commonjs
+  if( typeof exports !== "undefined" ){
+    exports.loadCSS = loadCSS;
+  }
+  else {
+    w.loadCSS = loadCSS;
+  }
+}( typeof global !== "undefined" ? global : this ) );</script><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" defer></script><script src="/js/main.js?v=2018.7.9" defer></script><!-- fancybox--><link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" defer></script><!-- busuanzi--><script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script><meta name="generator" content="Hexo 4.2.0"></head><body><section class="profile-close" id="cxo-profile"><div class="profile-avatar"><i class="fa fa-caret-left"></i><img src="https://dss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=1525175323,4282711120&amp;fm=26&amp;gp=0.jpg"></div><!--.profile-saying
+  i.fa.fa-comment
+  .saying--><div class="cxo-profile-inner"><div class="profile-name">行者自远</div><div class="profile-signature">码出行云流水般的感觉</div><div class="friends"><div>FRIENDS</div><span><a href="liujunchi-bot.github.io" target="_black">mygithub</a></span></div><div class="read-progress"></div></div></section><header id="cxo-intro" style="height: 70vh;background-image: url(https://timgsa.baidu.com/timg?image&amp;quality=80&amp;size=b9999_10000&amp;sec=1579025644130&amp;di=91083c502a018151c4baf71913b3c3fd&amp;imgtype=0&amp;src=http%3A%2F%2Fcdn.duitang.com%2Fuploads%2Fitem%2F201303%2F10%2F20130310192322_dCEtP.jpeg);"><nav id="cxo-intro-nav"><section><div class="intro-nav-title"><a href="/">Mr.Liu's Blog</a></div><div class="intro-nav-label-box"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div><i class="fa fa-bars intro-nav-menu"><div class="intro-nav-drop"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div></i><div class="clear"></div></section></nav><h1 class="post-title">快速搞定基于github的hexo主题个人博客网站</h1><div class="post-intros"><div class="post-intro-meta"><span class="post-intro-time"><i class="post-intro-calendar fa fa-edit"></i><span>2020-01-15</span></span><span class="post-intro-tags"><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="Web"> Web</a></span></div><div class="post-intro-read"><span> Word count: <span class="post-count">2k</span> | Reading time: <span class="post-count">7</span>min</span></div></div></header><article class="cxo-up" id="cxo-content-outer"><section id="cxo-content-inner"><article class="article-entry" id="post"><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>  接下来我们将会介绍基于github搭建的一个个人博客网站，我推荐使用hexo主题，这个类型的主题我觉得比较好看，而且也是比较新潮的那种，相信大家会喜欢的。</p>
+<h2 id="搭建流程"><a href="#搭建流程" class="headerlink" title="搭建流程"></a>搭建流程</h2><ul>
+<li>安装node：<br>直接去官网下载node，点击<a href="http://nodejs.cn/" target="_blank" rel="noopener">链接</a>，再去下载里面点击windowns下载即可。<br><img src="/.io//node.PNG" alt></li>
+<li>安装git，具体点击链接<a href="https://git-scm.com" target="_blank" rel="noopener">https://git-scm.com</a>,直接去官网上下载即可<br>至于使用和安装细节，大家可以参考博客：<a href="https://www.cnblogs.com/ximiaomiao/p/7140456.html" target="_blank" rel="noopener">https://www.cnblogs.com/ximiaomiao/p/7140456.html</a></li>
+<li>创建github账号<br>如果你没有github账号的话，博主建议你尽快建一个，github这个网站很好用，如何我们的博客搭建也需要借助它。<a href="https://github.com" target="_blank" rel="noopener">戳这里</a></li>
+<li>安装hexo<br>可以直接在桌面上点击鼠标右键，使用git Bash打开，然后在命令行里面输入：npm install -g hexo -cli即可，就可以直接下载Hexo了。<br>以上所有步骤做完以后，总算是把该下载的东西都下载好了，接下来我们正式开始了。<h2 id="基于github创建个人博客"><a href="#基于github创建个人博客" class="headerlink" title="基于github创建个人博客"></a>基于github创建个人博客</h2></li>
+<li>创建个人文件夹，为了方便你可以命名为Blog。</li>
+<li>然后点击文件夹，使用git Bash打开输入以下命令：<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">hexo init      &#x2F;&#x2F;在文件里面初始化hexo，与hexo关联</span><br><span class="line">hexo install   &#x2F;&#x2F;下载一些包</span><br><span class="line">npm install hexo-deployer-git --save      &#x2F;&#x2F;下载deployer</span><br></pre></td></tr></table></figure>
+以上命令执行成功，你会看到你的文件夹里面有许多相关文件。</li>
+<li>进入你的github网站，点击头像处-&gt;your reposory-&gt;new repo，即创建自己的个人仓库，出现以下界面：<br><img src="https://images2018.cnblogs.com/blog/894761/201711/894761-20171126213615000-987981425.png" alt="示例"></li>
+</ul>
+<p><strong>注意！！！如果你是搭建个人博客的话，仓库命名必须为：github用户名.github.io，然后选择public，README即可！</strong><br>创建好仓库以后，在仓库旁边的clone处查看并且复制一下SSH(后面要用)：<br><img src="/.io//repo.png" alt="SSH"></p>
+<ul>
+<li>之后进入之前建立的Blog文件夹里面，你可以看到一个config文件：</li>
+</ul>
+<p><img src="https://upload-images.jianshu.io/upload_images/16388343-a45b4c8d19d9efff.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/600/format/webp" alt><br>直接使用VScode或者Atom打开(没有的话可以下载一个，这两个编辑器还挺方便的)。然后在最下面的deploy处添加代码,注意：那里的SSH，你得添加自己刚刚从个人仓库里面复制的SSH。<br><img src="/.io//deploy.png" alt></p>
+<ul>
+<li>最后在当前Blog目录下利用git Bash，输入命令：hexo g -d。这样就可以把我们的个人博客部署到github上面了。<br>下面是原型：<br><img src="https://upload-images.jianshu.io/upload_images/16388343-3fabb4dcaf197c45.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/690/format/webp" alt><h2 id="hexo主题优化"><a href="#hexo主题优化" class="headerlink" title="hexo主题优化"></a>hexo主题优化</h2>以上的示例图片是默认主题landscape的，如果说你需要自己去找一些比较好看的主题的话，可以上hexo官网去找<a href="https://hexo.io/themes/" target="_blank" rel="noopener">https://hexo.io/themes/</a>.<br>我当初找的是一款Cxo主题，大家可以参考一下：<a href="https://gitee.com/sunset_rl/hexo-theme-Cxo" target="_blank" rel="noopener">戳Cxo</a><br><img src="https://gitee.com/sunset_rl/hexo-theme-Cxo/raw/master/source/img/demo/demo.png" alt="样例"><br>进入你所选择的主题以后，上面有教程教你怎么导入到你的个人博客当中。大家可以找着上面的教程做就行了，上面讲的还比较详细。</li>
+</ul>
+<p><strong>但是！！！！有坑需要注意：</strong>如果说你按照上面的教程做了以后，你可以在VS code当中进入当前Blog文件夹终端或者直接在Blog上面Git Bash进入命令行输入命令：hexo s<br>这样就可以点击它生成的链接，可以直接在本地观看效果，如果说本地运行没问题，并且你满意的话，就可以再输入命令：hex g -d部署到你的个人博客当中即可。如果说你部署的时候，发现你本地运行没问题，但是部署到个人博客以后，发现显示不出那个效果，或者说有问题的话，那么你就在输入命令：<br>hexo clean<br>hexo g -d<br>即可（这个坑博主debug了好久，当然如果说你们直接就部署好了就说明很欧气了）<br>如果说你们想换主题的话，也可以照着上面换就行了。</p>
+<h2 id="博客功能优化"><a href="#博客功能优化" class="headerlink" title="博客功能优化"></a>博客功能优化</h2><p>  我们刚刚所建立的博客，还有些功能欠缺，比如说评论，统计人数，阅读时间，字数等等，你可以在你所选择的主题官网上面查看<strong>其它配置</strong>，照着着上面来就行了。<br>  至于评论界面，有很多种方法，我建议大家可以利用gitment搭建免费的评论系统，比较好看方便。</p>
+<h3 id="首先注册OAuth-Application"><a href="#首先注册OAuth-Application" class="headerlink" title="首先注册OAuth Application"></a>首先注册OAuth Application</h3><p>  注册这个大家可以在github的settings的Developer settings选项找到，为了方便我还是附上网址吧：<a href="https://github.com/settings/applications/new" target="_blank" rel="noopener">传送门</a><br>  大家可以看到：<br>  <img src="https://img-blog.csdnimg.cn/20190117221004513.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2RkeHlncQ==,size_16,color_FFFFFF,t_70" alt><br>  这两个URL博主建议你们都填自己的博客地址(用户名.github.io)，其它的随便填没问题。<br>  创建完成可以看到这个界面：<br>  <img src="https://img-blog.csdnimg.cn/20190117221004693.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2RkeHlncQ==,size_16,color_FFFFFF,t_70" alt></p>
+<h3 id="修改你当前所用主题的themes下的-config-yml文件"><a href="#修改你当前所用主题的themes下的-config-yml文件" class="headerlink" title="修改你当前所用主题的themes下的_config.yml文件"></a>修改你当前所用主题的themes下的_config.yml文件</h3><p><img src="/.io//theme.png" alt><br>然后找到这一段代码进行修改：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">comment:</span><br><span class="line">  # Livere  site: https:&#x2F;&#x2F;livere.com&#x2F;</span><br><span class="line">  livere_uid:</span><br><span class="line">  # Disqus  site: https:&#x2F;&#x2F;disqus.com&#x2F;</span><br><span class="line">  disqus_shortname: </span><br><span class="line">  # Changyan  site: http:&#x2F;&#x2F;changyan.kuaizhan.com&#x2F;</span><br><span class="line">  changyan_appid: </span><br><span class="line">  changyan_conf: </span><br><span class="line">  # Gitment  site: https:&#x2F;&#x2F;github.com&#x2F;imsun&#x2F;gitment&#x2F;</span><br><span class="line">  gitment_owner: &#39;你的github用户名&#39;</span><br><span class="line">  gitment_repo: &#39;你的仓库名(可以建立一个专门的仓库存储评论信息)&#39;</span><br><span class="line">  gitment_client_id: &#39;你注册的OAuth Application的clientID&#39;</span><br><span class="line">  gitment_client_secret: &#39;你注册的OAuth Application里面的clientsecret&#39;</span><br></pre></td></tr></table></figure>
+<h3 id="初始化评论"><a href="#初始化评论" class="headerlink" title="初始化评论"></a>初始化评论</h3><p>做完上面几步以后，你可以直接在当前git Bash命令行里面输入：hexo g -d把当前内容部署到博客上面。进入你的个人博客界面，随便选择一篇博客，然后到博客最下面点击头像登陆，之后点击初始化即可。<br><img src="https://img-blog.csdnimg.cn/20190117221004605.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2RkeHlncQ==,size_16,color_FFFFFF,t_70" alt><br>完成。</p>
+<h2 id="写个人博客"><a href="#写个人博客" class="headerlink" title="写个人博客"></a>写个人博客</h2><p>  首先你要写个人博客，得先去Blog文件里面点击source-&gt;_posts，在这里面创建md文件即可，然后可以利用VS code打开md文件，之后就可以在里面写博客了。<br>  我们自己部署的个人博客界面支持markdown编辑语言，对于它的语法还挺简单的，大家可以去了解一下：<a href="https://www.jianshu.com/p/191d1e21f7ed" target="_blank" rel="noopener">点击即可了解markdown语法</a><br>  如果说你需要对你的文章加一点属性，比如说tag,title，date等等，你可以在md文件的最上面写上</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">title: Hello-Hexo!</span><br><span class="line">date: 2018-06-20 14:39:37</span><br><span class="line">tag: web</span><br></pre></td></tr></table></figure>
+<p>代码上下用—包裹</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">---</span><br><span class="line">代码(描述文章属性)</span><br><span class="line">---</span><br></pre></td></tr></table></figure>
+<p>  然后三横线下面就是你的正文内容了，你可以参考markdown语法编写，当然，到这里大家肯定会疑惑，这么麻烦，我还不如用CSDN或者博客园直接编写博客了。我觉得是的，刚开始的确麻烦了点，但是那只是你安装，搭建过程，麻烦，markdown语言编写出来的博客很精美，而且个人博客不像CSDN那样，主题，界面，功能等东西都是固定的，个人博客可以根据你个人的喜好去定制编写，很有弹性，人性。而且当你去面试的时候，你写出一个个人博客，也是一件小项目吧。<br>  如果说你想在你的个人博客文章上面添加摘要图片的话，可以去你的博客md文件，属性代码里面写上：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">photos:</span><br><span class="line">- http:&#x2F;&#x2F;pic.90sjimg.com&#x2F;back_pic&#x2F;qk&#x2F;back_origin_pic&#x2F;00&#x2F;03&#x2F;90&#x2F;9d60d6efd18d8fa7bdb87f4a7840b787.jpg</span><br><span class="line">- &#39;test&#39;</span><br></pre></td></tr></table></figure>
+<p><img src="/.io//ex.png" alt="效果图"><br>  当然，我们写博客肯定也会用到很多图片，我们如果说要加本地图片的话，为了以后能够省事，大家可以：</p>
+<blockquote>
+<p>1.首先把blog（hexo）目录下的_config.yml里的psot_asset_folder:设置为true</p>
+</blockquote>
+<blockquote>
+<p>2.在blog（hexo）目录下执行:<br>npm install hexo-asset-image –save<br>3.在blog（hexo）目录下Git Bash Here，运行hexo n “博客名”来生成md博客时，会在_post目录下看到一个与博客同名的文件夹。<br>4.将想要上传的图片先扔到文件夹下，然后在博客中使用markdown的格式引入图片：</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">![你想要输入的替代文字](xxxx&#x2F;图片名.jpg)</span><br></pre></td></tr></table></figure>
+
+<p> 如果是加上网络图片的话，就可以直接把链接拷贝进去即可。<br> 最后，大家写完博客的话，直接在git Bash命令里面输入：hexo g -d部署到博客即可。</p>
+</article><!-- lincense--><div class="license-wrapper"><p> <span>Author:  </span><a href="http://liujunchi-bot.github.io">John Doe</a></p><p> <span>Link:  </span><a href="http://liujunchi-bot.github.io/2020/01/15/%E5%BF%AB%E9%80%9F%E6%90%9E%E5%AE%9A%E5%9F%BA%E4%BA%8Egithub%E7%9A%84hexo%E4%B8%BB%E9%A2%98%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2%E7%BD%91%E7%AB%99/">http://liujunchi-bot.github.io/2020/01/15/%E5%BF%AB%E9%80%9F%E6%90%9E%E5%AE%9A%E5%9F%BA%E4%BA%8Egithub%E7%9A%84hexo%E4%B8%BB%E9%A2%98%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2%E7%BD%91%E7%AB%99/</a></p><p> <span>Copyright:  </span><span>All articles in this blog are licensed under <a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-nd/3.0" target="_blank">CC BY-NC-SA 3.0</a> unless stating additionally.</span></p></div><div class="post-paginator"><a class="nextSlogan" href="/2018/06/20/hello-world/" title="Hello-Hexo!"><span>NextPost ></span><br><span class="nextTitle">Hello-Hexo!</span></a><div class="clear"></div></div><div id="comment"><div id="container"></div><link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css"><script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script><script>var gitment = new Gitment({
+  //- id: '快速搞定基于github的hexo主题个人博客网站',
+  //- owner: 'liujunchi-bot',
+  //- repo: 'Blog-Comment',
+  //- oauth: {
+  //-   client_id: 'fcc11412ea5eb9310de3',
+  //-   client_secret: 'fb83a32085e0e8570fd37c38d4909a2436776fde',
+  //- },
+  id: '{% raw %}{{ page.date }}{% endraw %}',
+  owner: 'liujunchi-bot',
+  repo: 'Blog-Comment',
+  oauth: {
+    client_id: 'fcc11412ea5eb9310de3',
+    client_secret: 'fb83a32085e0e8570fd37c38d4909a2436776fde',
+  },
+})
+gitment.render('container')</script></div></section></article><footer id="cxo-footer-outer"><div id="cxo-footer-inner"><p class="footer-container"><span>Site by </span><a href="http://hexo.io" target="_blank" rel="noopener"><span>Hexo</span></a><span> | theme </span><a href="https://github.com/Longlongyu/hexo-theme-Cxo" target="_blank" rel="noopener"><span>Cxo</span></a></p><i class="fa fa-user"> </i><span id="busuanzi_value_site_uv"></span><span> | </span><i class="fa fa-eye"> </i><span id="busuanzi_value_site_pv"></span></div></footer><!-- catelog--><div class="toc-wrapper" style="top: 70vh;"><div class="toc-catalog"><i class="fa fa-list"> </i><span>CATALOG</span></div><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#概述"><span class="toc-number">1.</span> <span class="toc-text">概述</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#搭建流程"><span class="toc-number">2.</span> <span class="toc-text">搭建流程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#基于github创建个人博客"><span class="toc-number">3.</span> <span class="toc-text">基于github创建个人博客</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#hexo主题优化"><span class="toc-number">4.</span> <span class="toc-text">hexo主题优化</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#博客功能优化"><span class="toc-number">5.</span> <span class="toc-text">博客功能优化</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#首先注册OAuth-Application"><span class="toc-number">5.1.</span> <span class="toc-text">首先注册OAuth Application</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#修改你当前所用主题的themes下的-config-yml文件"><span class="toc-number">5.2.</span> <span class="toc-text">修改你当前所用主题的themes下的_config.yml文件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#初始化评论"><span class="toc-number">5.3.</span> <span class="toc-text">初始化评论</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#写个人博客"><span class="toc-number">6.</span> <span class="toc-text">写个人博客</span></a></li></ol></div><!-- top--><i class="fa fa-arrow-up close" id="go-up" aria-hidden="true"></i></body></html>
