@@ -1,0 +1,549 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"><meta name="author" content="John Doe"><meta name="renderer" content="webkit"><meta name="copyright" content="John Doe"><meta name="keywords" content="Hexo"><meta name="description" content=""><meta name="Cache-Control" content="no-cache"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><title>吃透计算机组成原理 · Mr.Liu's Blog</title><link rel="stylesheet" href="/css/style.css?v=2018.7.9"><link rel="stylesheet" href="/css/animation.css?v=2018.7.9"><link rel="icon" href="/img/assets/favicon.ico"><link rel="stylesheet" href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css?version=1.5.6"><!-- scripts--><script>(function( w ){
+  "use strict";
+  // rel=preload support test
+  if( !w.loadCSS ){
+    w.loadCSS = function(){};
+  }
+  // define on the loadCSS obj
+  var rp = loadCSS.relpreload = {};
+  // rel=preload feature support test
+  // runs once and returns a function for compat purposes
+  rp.support = (function(){
+    var ret;
+    try {
+      ret = w.document.createElement( "link" ).relList.supports( "preload" );
+    } catch (e) {
+      ret = false;
+    }
+    return function(){
+      return ret;
+    };
+  })();
+
+  // if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+  // then change that media back to its intended value on load
+  rp.bindMediaToggle = function( link ){
+    // remember existing media attr for ultimate state, or default to 'all'
+    var finalMedia = link.media || "all";
+
+    function enableStylesheet(){
+      link.media = finalMedia;
+    }
+
+    // bind load handlers to enable media
+    if( link.addEventListener ){
+      link.addEventListener( "load", enableStylesheet );
+    } else if( link.attachEvent ){
+      link.attachEvent( "onload", enableStylesheet );
+    }
+
+    // Set rel and non-applicable media type to start an async request
+    // note: timeout allows this to happen async to let rendering continue in IE
+    setTimeout(function(){
+      link.rel = "stylesheet";
+      link.media = "only x";
+    });
+    // also enable media after 3 seconds,
+    // which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+    setTimeout( enableStylesheet, 3000 );
+  };
+
+  // loop through link elements in DOM
+  rp.poly = function(){
+    // double check this to prevent external calls from running
+    if( rp.support() ){
+      return;
+    }
+    var links = w.document.getElementsByTagName( "link" );
+    for( var i = 0; i < links.length; i++ ){
+      var link = links[ i ];
+      // qualify links to those with rel=preload and as=style attrs
+      if( link.rel === "preload" && link.getAttribute( "as" ) === "style" && !link.getAttribute( "data-loadcss" ) ){
+        // prevent rerunning on link
+        link.setAttribute( "data-loadcss", true );
+        // bind listeners to toggle media back
+        rp.bindMediaToggle( link );
+      }
+    }
+  };
+
+  // if unsupported, run the polyfill
+  if( !rp.support() ){
+    // run once at least
+    rp.poly();
+
+    // rerun poly on an interval until onload
+    var run = w.setInterval( rp.poly, 500 );
+    if( w.addEventListener ){
+      w.addEventListener( "load", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    } else if( w.attachEvent ){
+      w.attachEvent( "onload", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    }
+  }
+
+
+  // commonjs
+  if( typeof exports !== "undefined" ){
+    exports.loadCSS = loadCSS;
+  }
+  else {
+    w.loadCSS = loadCSS;
+  }
+}( typeof global !== "undefined" ? global : this ) );</script><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" defer></script><script src="/js/main.js?v=2018.7.9" defer></script><!-- fancybox--><link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" defer></script><!-- busuanzi--><script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script><meta name="generator" content="Hexo 4.2.0"></head><body><section class="profile-close" id="cxo-profile"><div class="profile-avatar"><i class="fa fa-caret-left"></i><img src="https://dss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=1525175323,4282711120&amp;fm=26&amp;gp=0.jpg"></div><!--.profile-saying
+  i.fa.fa-comment
+  .saying--><div class="cxo-profile-inner"><div class="profile-name">行者自远</div><div class="profile-signature">码出行云流水般的感觉</div><div class="friends"><div>FRIENDS</div><span><a href="liujunchi-bot.github.io" target="_black">mygithub</a></span></div><div class="read-progress"></div></div></section><header id="cxo-intro" style="height: 70vh;background-image: url(https://timgsa.baidu.com/timg?image&amp;quality=80&amp;size=b9999_10000&amp;sec=1579025644130&amp;di=91083c502a018151c4baf71913b3c3fd&amp;imgtype=0&amp;src=http%3A%2F%2Fcdn.duitang.com%2Fuploads%2Fitem%2F201303%2F10%2F20130310192322_dCEtP.jpeg);"><nav id="cxo-intro-nav"><section><div class="intro-nav-title"><a href="/">Mr.Liu's Blog</a></div><div class="intro-nav-label-box"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a><a href="/categories/">Categories</a></div><i class="fa fa-bars intro-nav-menu"><div class="intro-nav-drop"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a><a href="/categories/">Categories</a></div></i><div class="clear"></div></section></nav><h1 class="post-title">吃透计算机组成原理</h1><div class="post-intros"><div class="post-intro-meta"><span class="post-intro-time"><i class="post-intro-calendar fa fa-edit"></i><span>2020-01-31</span></span><span class="post-intro-tags"><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="Basics"> Basics</a></span></div><div class="post-intro-read"><span> Word count: <span class="post-count">8.7k</span> | Reading time: <span class="post-count">31</span>min</span></div></div></header><article class="cxo-up" id="cxo-content-outer"><section id="cxo-content-inner"><article class="article-entry" id="post"><h1 id="博主杂谈"><a href="#博主杂谈" class="headerlink" title="博主杂谈"></a>博主杂谈</h1><p>  计算机组成原理这门课算是CS专业当中比较主要核心的一门课，博主把自己对这门课相关知识点的理解做了一个总结，若有不当或不同观点的地方，可与博主一起华山论剑。</p>
+<h1 id="计算机概论"><a href="#计算机概论" class="headerlink" title="计算机概论"></a>计算机概论</h1><h2 id="计算机发展历程"><a href="#计算机发展历程" class="headerlink" title="计算机发展历程"></a>计算机发展历程</h2><p><strong>第一代：电子管计算机(1946-1958年)：</strong></p>
+<blockquote>
+<p>硬件方面，逻辑元件采用的是真空电子管，主存储器采用汞延迟线、阴极射线示波管静电存储器、磁鼓、磁芯；外存储器采用的是磁带。软件方面采用的是机器语言、汇编语言。应用领域以军事和科学计算为主。</p>
+</blockquote>
+<p>电子管计算机我们可以想象一下，一看就算那种体积超大的大老粗版本的计算机，价格昂贵，电路极其复杂，空间占用大，功耗大，速度慢，操作复杂。但是这也为以后的计算机发展奠定了基础。<br><img src="https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=738364407,3676174150&fm=26&gp=0.jpg" alt="电子管计算机"><br><strong>第二代：晶体管计算机(1958-1964年)：</strong></p>
+<blockquote>
+<p>硬件方的操作系统、高级语言及其编译程序。应用领域以科学计算和事务处理为主，并开始进入工业控制领域。</p>
+</blockquote>
+<p>这个相比之前的电子管计算机肯定是针对它的缺点进行了相应的优化，体积进行了相应的缩小，能耗降低，速度增快(一般为每秒数10万次，可高达300万次)，操作相对也简单了，更加可靠。但是呢，这个仍然无法进入家家户户，无法普遍使用，只能普及到工业界当中。<br><img src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1580381364204&di=1d0eba23a71192073e94bd064e48dc03&imgtype=0&src=http%3A%2F%2Fimgsrc.baidu.com%2Fforum%2Fw%3D580%2Fsign%3D0b79a3b6233fb80e0cd161df06d02ffb%2F208b43cf3bc79f3df24c4bb7b8a1cd11738b293a.jpg" alt="晶体管计算机"><br><strong>第三代：集成电路计算机(1964-1970年)：</strong></p>
+<blockquote>
+<p>硬件方面，逻辑元件采用中、小规模集成电路（MSI、SSI），主存储器仍采用磁芯。软件方面出现了分时操作系统以及结构化、规模化程序设计方法。</p>
+</blockquote>
+<p>可以想象，这个将大量晶体管集成起来，肯定会使得体积大大减小，速度进一步加快(一般为每秒数百万次至数千万次)，可靠性进一步提高，成本降低，价格降低，产品进一步走向通用化，系列化，应用领域开始由工业领域进入文字处理和图形图像处理领域，这也导致了操作系统的产生。<br><img src="https://bkimg.cdn.bcebos.com/pic/279759ee3d6d55fb853eb38c63224f4a21a4dda4?x-bce-process=image/watermark,g_7,image_d2F0ZXIvYmFpa2U3Mg==,xp_5,yp_5" alt="集成电路计算机"><br><strong>第四代：超大规模集成电路计算机(1970年-至今):</strong></p>
+<blockquote>
+<p>硬件方面，逻辑元件采用大规模和超大规模集成电路（LSI和VLSI）。软件方面出现了数据库管理系统、网络管理系统和面向对象语言等。特点是1971年世界上第一台微处理器在美国硅谷诞生，开创了微型计算机的新时代。应用领域从科学计算、事务管理、过程控制逐步走向家庭。</p>
+</blockquote>
+<p>此时计算机变得体积更加小，价格更低，适用于普通大众，开始逐渐走向家家户户。<br><img src="http://a.hiphotos.baidu.com/baike/s=220/sign=5203b450a8d3fd1f3209a538004f25ce/aa18972bd40735fa364569c79e510fb30f240812.jpg" alt><br><strong>第五代：未来计算机(未来)：量子计算机和生物计算机</strong></p>
+<blockquote>
+<p>  量子计算机（quantum computer）是一类遵循量子力学规律进行高速数学和逻辑运算、存储及处理量子信息的物理装置。当某个装置处理和计算的是量子信息，运行的是量子算法时，它就是量子计算机。量子计算机的概念源于对可逆计算机的研究。研究可逆计算机的目的是为了解决计算机中的能耗问题。<br>量子计算机的特点主要有运行速度较快、处置信息能力较强、应用范围较广等。与一般计算机比较起来,信息处理量愈多，对于量子计算机实施运算也就愈加有利,也就更能确保运算具备精准性。 </p>
+</blockquote>
+<blockquote>
+<p>  生物计算机也称仿生计算机，主要原材料是生物工程技术产生的蛋白质分子，并以此作为生物芯片来替代半导体硅片，利用有机化合物存储数据。信息以波的形式传播，当波沿着蛋白质分子链传播时，会引起蛋白质分子链中单键、双键结构顺序的变化。运算速度要比当今最新一代计算机快10万倍，它具有很强的抗电磁干扰能力，并能彻底消除电路间的干扰。能量消耗仅相当于普通计算机的十亿分之一，且具有巨大的存储能力。生物计算机具有生物体的一些特点，如能发挥生物本身的调节机能，自动修复芯片上发生的故障，还能模仿人脑的机制等</p>
+</blockquote>
+<p>目前量子计算机也已经研发出来了，相信会不断改进，降低成本体积，逐渐进入到家家户户当中。</p>
+<h2 id="计算机的分类"><a href="#计算机的分类" class="headerlink" title="计算机的分类"></a>计算机的分类</h2><ul>
+<li><p>超级计算机：通常是指由数百数千甚至更多的处理器（机）组成的、能计算普通PC机和服务器不能完成的大型复杂课题的计算机。超级计算机是计算机中功能最强、运算速度最快、存储容量最大的一类计算机，是国家科技发展水平和综合国力的重要标志。比如说我们的超算中心。</p>
+</li>
+<li><p>大型计算机：计算机中通用性能最强，功能、速度、存储量仅次于超算机的一类计算机，国外习惯上将其称为主机(Mainframe)。大型机具有比较完善的指令系统和丰富的外部设备，很强的管理和处理数据的能力，一般用在大型企业、金融系统、高校、科研院所等。</p>
+</li>
+<li><p>服务器：可以被网络用户共享、为网络用户提供服务的一类高性能计算机。一般都配置多个CPU，有较高的运行速度，并具有超大容量的存储设备和丰富的外部接口。比如说阿里云，腾讯云这类云服务器。</p>
+</li>
+<li><p>小型机：计算机中性能较好、价格便宜、应用领域非常广泛的一类计算机。其浮点运算速度可达每秒几千万次。小型机结构简单、使用和维护方便，备受中小企业欢迎，主要用于科学计算、数据处理和自动控制等。</p>
+</li>
+<li><p>微型计算机：就是我们现在用的台式电脑，笔记本电脑。</p>
+</li>
+</ul>
+<h2 id="计算机的结构体系"><a href="#计算机的结构体系" class="headerlink" title="计算机的结构体系"></a>计算机的结构体系</h2><h3 id="冯诺依曼体系"><a href="#冯诺依曼体系" class="headerlink" title="冯诺依曼体系"></a>冯诺依曼体系</h3><p><strong>1.特点：</strong>程序指令和存储器一起存储。</p>
+<p><strong>2.基本组成：</strong>由存储器，运算器，控制器(运算器和控制器为CPU)，输入设备，输出设备。</p>
+<ul>
+<li><p>存储器：长期记忆程序，数据，中间运算结果以及最终运算结果，方便下一步的处理，会影响输出。</p>
+</li>
+<li><p>控制器，运算器：具备算数，逻辑运算，数据传送等数据加工的能力</p>
+</li>
+<li><p>输入设备：把需要的程序和数据送给计算机处理</p>
+</li>
+<li><p>输出设备：按要求把处理的结果输出给用户</p>
+</li>
+</ul>
+<p><strong>如下图：</strong><br><img src="https://bkimg.cdn.bcebos.com/pic/a8773912b31bb051973f1da5367adab44aede020?x-bce-process=image/watermark,g_7,image_d2F0ZXIvYmFpa2U4MA==,xp_5,yp_5" alt></p>
+<p><strong>3.工作原理：</strong>采用二进制，<strong>程序指令和数据一起存储。</strong>按程序编排的顺序，一步一步地取出指令，自动地完成指令规定的操作</p>
+<p><strong>4.相对之前计算机的改进：</strong>之前的计算机一般都仅含固定程序，改程序就必须得改结构，重新设计电路，非常的不方便，而计算机的发展则是朝着让人更加舒服方便的方向发展，因此冯诺依曼机就算把程序存储起来，设计通用电路，使得可以轻易的改变程序，更加灵活方便。</p>
+<p><strong>5.冯诺依曼瓶颈：</strong>从上面的基本组成我们可以看出，CPU和存储器是分开来的，而CPU的运算处理速度非常的快，但是呢，存储器相对来说，接收数据速度比较慢，就造成了CPU经常空转等待数据传输，极大的浪费了资源等问题，也就是说<strong>CPU与存储器之间的性能问题。</strong>这个瓶颈也对现代计算机产生了重大的影响，促使了缓存架构的开发。</p>
+<h3 id="现代计算机体系"><a href="#现代计算机体系" class="headerlink" title="现代计算机体系"></a>现代计算机体系</h3><p>  相对冯诺依曼体系做出了重大改进，突破了冯诺依曼瓶颈，把存储器放入了CPU当中，解决了CPU与存储器之间的性能问题。</p>
+<h1 id="计算机的层次与编程语言"><a href="#计算机的层次与编程语言" class="headerlink" title="计算机的层次与编程语言"></a>计算机的层次与编程语言</h1><h2 id="程序翻译与程序解释"><a href="#程序翻译与程序解释" class="headerlink" title="程序翻译与程序解释"></a>程序翻译与程序解释</h2><p><strong>1.概述：</strong>假设L1为高级的计算机程序语言，L0为低级计算机程序语言</p>
+<ul>
+<li>程序翻译就是L1通过编译器直接生成L0，而程序解释则是通过L0编写的解释器程序，将原来的L1作为输入，一句句转换为L0，并且执行。</li>
+</ul>
+<p><strong>2.区别：</strong></p>
+<ul>
+<li><p>程序翻译是由一种语言直接生成另外一种语言，而解释器则不直接生成</p>
+</li>
+<li><p>解释过程由L0编写的解释器取解释L1程序，而程序翻译过程则是由编译器直接生成L0。</p>
+</li>
+</ul>
+<p><strong>3.特例：</strong>有的程序语言比较特殊，是翻译，解释一起运行，比如说Java，C#语言。以Java语言为例，Java语言编写的程序会首先通过程序翻译编译成JVM字节码，然后JVM字节码才会通过解释器解释为机器码进行相应的程序执行。<br><img src="/2020/01/03/Computer/1.png" alt></p>
+<h2 id="计算机层次"><a href="#计算机层次" class="headerlink" title="计算机层次"></a>计算机层次</h2><p><strong>1.计算机层次组成(自底向上)：</strong>硬件逻辑层，微程序机器层，传统机器层(这三个称为实际机器)，操作系统层，汇编语言层，高级语言层(系统软件层)，应用层(应用软件层)。</p>
+<ul>
+<li>硬件逻辑层：由门，触发器等逻辑电路组成</li>
+<li>微程序机器层：有很多微指令，一个微程序有一组微指令</li>
+<li>传统机器层：里面有很多CPU指令集，和硬件直接相关。</li>
+</ul>
+<p><strong>！！！注：不同架构CPU对应着不同的CPU指令集，一条机器指令对应一个微程序，但是一个微程序对应一组微指令。</strong></p>
+<ul>
+<li>操作系统层：向上提供了简易的操作界面，向下对接了指令系统，管理硬件等资源，可以说是软件和硬件的过渡层和适配层。</li>
+<li>汇编语言层：编程语言是汇编语言(C#)，其可以直接汇编成可直接被机器识别并且执行的机器语言，过程需要汇编器。</li>
+<li>高级语言层：比如说python，Java，C++等语言。</li>
+<li>应用层：满足某种用途而设计的应用</li>
+</ul>
+<h1 id="计算机计算单位与字符编码"><a href="#计算机计算单位与字符编码" class="headerlink" title="计算机计算单位与字符编码"></a>计算机计算单位与字符编码</h1><h2 id="计算机计算单位"><a href="#计算机计算单位" class="headerlink" title="计算机计算单位"></a>计算机计算单位</h2><p><strong>1.容量单位：</strong></p>
+<table>
+<thead>
+<tr>
+<th>bit</th>
+<th>Byte</th>
+<th>KB</th>
+<th>MB</th>
+<th>GB</th>
+<th>TB</th>
+<th>PB</th>
+<th>EB</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>最小</td>
+<td>8 bits</td>
+<td>1024 B</td>
+<td>1024KB</td>
+<td>1024MB</td>
+<td>1024GB</td>
+<td>1024TB</td>
+<td>1024PB</td>
+</tr>
+<tr>
+<td>门电路</td>
+<td></td>
+<td>寄存器</td>
+<td>高速缓存</td>
+<td>内存/硬盘</td>
+<td>硬盘</td>
+<td>云硬盘</td>
+<td>数据库</td>
+</tr>
+</tbody></table>
+<p><strong>2.速度单位：</strong></p>
+<ul>
+<li>网络速度：比如说2M,4M,100M宽带，这里指的就是网络速度单位</li>
+<li>CPU速度：时钟频率，比如说hz(赫兹)。</li>
+</ul>
+<h2 id="计算机字符编码"><a href="#计算机字符编码" class="headerlink" title="计算机字符编码"></a>计算机字符编码</h2><h3 id="字符编码种类与历程"><a href="#字符编码种类与历程" class="headerlink" title="字符编码种类与历程"></a>字符编码种类与历程</h3><p><strong>1.ASCII码：</strong>由大写字母，小写字母，符号，数字组成，其中编码是7个字节，含有95个可打印字符和33个不可打印字符，总共128个，128=2^7，因此7个字节足够，但是很多应用和国家当中的符号无法使用其进行表示。因此有了：</p>
+<p><strong>2.扩展的ASCII码：</strong>编码扩展为8个字节，加入了数字运算符，带音标的欧洲字符。</p>
+<p><strong>3.GB2312码：</strong>含有7445个字符，6763个汉字，682个其他符号，可以看来，这个字符编码还是比较完备的，但是呢，其又不符合国际标准因此后面也被抛弃了。</p>
+<p><strong>4.GBK码：</strong>向下兼容GB2312，向上支持ISO国际标准，收录了21003个汉字，支持中日韩文字，一般来说Windows默认使用GBK编码。</p>
+<p><strong>5.Unicode:</strong>又称为统一码，万国码，世界通用，使用UTF系列实现，UTF-8以字节单位对Unicode进行存储。记住！！！UTF-8不等同于Unicode。一般来说，编程推荐使用utf-8.</p>
+<h1 id="计算机内部结构"><a href="#计算机内部结构" class="headerlink" title="计算机内部结构"></a>计算机内部结构</h1><h2 id="计算机总线"><a href="#计算机总线" class="headerlink" title="计算机总线"></a>计算机总线</h2><p><strong>1.功能概述：</strong>解决不同设备之间的通信问题</p>
+<ul>
+<li>提供对外接口</li>
+<li>不同设备可以以此连接</li>
+<li>促使外部接口统一</li>
+</ul>
+<p><strong>2.分类：</strong><br>A.片内总线：顾名思义，也就是芯片内部的总线，比如说连接芯片内部的寄存器，运算器之间，主要还是简化内部结构。</p>
+<p>B.系统总线：</p>
+<ul>
+<li><p>数据总线：一般与CPU位数相同，可以双向传输各个部件的数据，而且其位数是一个衡量总线质量性能的重要参数。</p>
+</li>
+<li><p>地址总线：用于数据寻址，比如说地址总线位数为n，那么它寻址的范围是0~2^n，它可以指定数据在内存当中的地址。</p>
+</li>
+<li><p>控制总线：可以发出各种控制信号，并且监视不同组件之间的状态。</p>
+</li>
+</ul>
+<p><strong><em>关键点来了！！！！</em></strong></p>
+<p><strong>3.总线的仲裁：</strong>总线可以连接多个设备，但是当多个设备同时使用总线的时候，不可避免的会产生冲突，未来解决这个问题，就有了总线的仲裁方案。</p>
+<ul>
+<li><p><strong>链式查询法：</strong><br><img src="https://img-blog.csdnimg.cn/20181118111613415.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM5MzY4MDA3,size_16,color_FFFFFF,t_70" alt><br>以上图为例，当I/O设备1需要使用总线的时候，它会发送请求信号给总线控制器，也就是仲裁器，之后仲裁器会发送”同意”信号，依次结果0-&gt;1-&gt;2设备，若设备0无请求，那么信号会继续到达下一个I/O设备，设备接收到同意信号以后就会占用总线进行使用。当然如果之前设备0就已经发出过请求了，那么就是设备0的使用优先级更加高，使用优先级按照链式依次递减。电路因此缺点也就出来了，<strong>这会使得优先级比较低的设备难以获得总线使用权，并且只要有一个设备故障，那么对整体造成的影响就比较大，对故障比较敏感。</strong>当然这种方法比较简单，相应的电路复杂度也比较低，成本也低。</p>
+</li>
+<li><p><strong>计数器定时查询法：</strong><br><img src="https://img-blog.csdnimg.cn/20181118114532501.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM5MzY4MDA3,size_16,color_FFFFFF,t_70" alt><br>以上图为例，仲裁控制器会对每一个设备进行编号，使用计数器进行计数，当接收到请求信号的时候，会往所有的设备发送计数值，当计数值与编号一致的的时候，则设备可以获得总线的使用权。过程有点麻烦，电路也相对复杂，但是可以通过编号改变优先级。</p>
+</li>
+<li><p><strong>独立请求法：</strong><br><img src="https://img-blog.csdnimg.cn/20181118115456392.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM5MzY4MDA3,size_16,color_FFFFFF,t_70" alt><br>以上图为例，每个IO设备都会独立连接仲裁器，设备可以单独向仲裁器发送请求和接收信号，当有多个设备发送请求的时候，仲裁器可以有权分配优先级使用权。这会使得响应速度变快，改变优先级比较方便，对电路故障的敏感度也相对较低，但是连线较多，成本高，比较复杂。</p>
+</li>
+</ul>
+<h2 id="计算机的输入输出设备"><a href="#计算机的输入输出设备" class="headerlink" title="计算机的输入输出设备"></a>计算机的输入输出设备</h2><p><strong>1.常见的输入输出设备：</strong></p>
+<ul>
+<li><p>字符输入设备：比如说有键盘</p>
+</li>
+<li><p>图像输入设备：鼠标，输入板，扫描仪</p>
+</li>
+<li><p>图像输出设备：显示器，打印机，投影仪</p>
+</li>
+</ul>
+<p><strong>2.接口的通用设计：</strong>为了使计算机能够读取，发送数据，判断设备是否被占用，是否已经连接，启动等等。</p>
+<ul>
+<li><p>数据线：使得计算机能够和IO设备进行数据交换，即读取，发送数据</p>
+</li>
+<li><p>状态线：判断设备是否已经被占用，是否已经正常连接</p>
+</li>
+<li><p>命令线：发送读写信号，发送启动停止信号</p>
+</li>
+<li><p>设备选择线：对连在总线上的设备进行选择</p>
+</li>
+</ul>
+<p><strong>3.CPU与IO设备的通信方法(输入输出)：</strong></p>
+<ul>
+<li><p>程序查询方式：是完全通过程序来控制主机和外围设备之间的信息传送。<br>通常的办法是在用户的程序中安排一段由输入输出指令和其他指令所组成的程序段直接控制外围设备的工作。也就是说CPU要不断地查询外围设备的工作状态，一旦外围设备“准备好”或“不忙”，即可进行数据的传送。该方法是主机与外设之间进行数据交换的最简单、最基本的控制方法。</p>
+</li>
+<li><p>程序中断方式：当外围IO设备准备就绪的时候，向CPU发送中断信号，CPU有专门的电路响应中断信号。</p>
+</li>
+<li><p>DMA方式：在外围设备和主存之间开辟直接的数据通路。在正常工作时，所有的工作周期均用于执行CPU的程序。当外围设备完成I/O的准备工作后，占用CPU的工作周期，和主存直接交换数据。完成后，CPU又继续控制总线，执行原程序。完成这项工作的是系统中增设的DMA控制器。</p>
+</li>
+</ul>
+<p><strong>这三种方式的区别：</strong></p>
+<blockquote>
+<p>（1）程序查询、程序中断方式的数据传送主要依赖软件，DMA主要依赖硬件。 （注意：这里指主要的趋势）</p>
+</blockquote>
+<blockquote>
+<p>（2）程序查询、程序中断传送数据的基本单位为字或字节，DMA为数据块。</p>
+</blockquote>
+<blockquote>
+<p>（3）程序查询方式传送时，CPU与I/O设备串行工作；程序中断方式时，CPU与I/O设备并行工作，现行程序与I/O传送串行进行；DMA方式时，CPU与I/O设备并行工作，现行程序与I/O传送并行进行。</p>
+</blockquote>
+<blockquote>
+<p>（4）程序查询方式时，CPU主动查询I/O设备状态；程序中断及DMA方式时，CPU被动接受I/O中断请求或DMA请求。</p>
+</blockquote>
+<blockquote>
+<p>（5）程序中断方式由于软件额外开销时间比较大，因此传输速度最慢；程序查询方式软件额外开销时间基本没有，因此传输速度比中断快；DMA方式基本由硬件实现传送，因此速度最快；</p>
+</blockquote>
+<blockquote>
+<p>注意：程序中断方式虽然CPU运行效率比程序查询高，但传输速度却比程序查询慢。</p>
+</blockquote>
+<blockquote>
+<p>（6）程序查询接口硬件结构最简单，因此最经济；程序中断接口硬件结构稍微复杂一些，因此较经济；DMA控制器硬件结构最复杂，因此成本最高；</p>
+</blockquote>
+<blockquote>
+<p>（7）程序中断方式适用于中、低速设备的I/O交换；程序查询方式适用于中、低速实时处理过程；DMA方式适用于高速设备的I/O交换；</p>
+</blockquote>
+<h2 id="存储器"><a href="#存储器" class="headerlink" title="存储器"></a>存储器</h2><p>1.分类：</p>
+<table>
+<thead>
+<tr>
+<th>存储介质</th>
+<th></th>
+<th>存取方式</th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>半导体存储器</td>
+<td>U盘，内存等等</td>
+<td>RAM</td>
+<td>随机存取，与位置无关</td>
+</tr>
+<tr>
+<td>磁存储器</td>
+<td>磁盘磁带等等</td>
+<td>ROM</td>
+<td>只读不写</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>串行存储器</td>
+<td>按顺序存储，与位置有关</td>
+</tr>
+</tbody></table>
+<p>2.层次结构：</p>
+<table>
+<thead>
+<tr>
+<th>缓存</th>
+<th>高速缓存</th>
+<th>速度快，位价高</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>主存</td>
+<td>内部存储</td>
+<td>速度中，位价中</td>
+</tr>
+<tr>
+<td>辅存</td>
+<td>外部存储</td>
+<td>速度低，位价低</td>
+</tr>
+</tbody></table>
+<p><img src="https://dss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=3599456226,1911690540&fm=15&gp=0.jpg" alt><br>其中，在主存和CPU之间加一个高速缓存为缓存-主存层次结构，其原理为局部性原理，即计算机CPU在访问存储器的时候，所访问的存储单元会趋于聚集在一个较小的连续区域，这个可以解决主存速度不足的问题，当然，为了解决主存容量不足的问题，还引入了主存-辅存结构，即在外部加一个辅存。</p>
+<h3 id="主存与辅存"><a href="#主存与辅存" class="headerlink" title="主存与辅存"></a>主存与辅存</h3><p>1.概述：</p>
+<blockquote>
+<p>主存：主存，又称内存，是计算机中重要的部件之一，它是与CPU进行沟通的桥梁。计算机中所有程序的运行都是在内存中进行的，因此内存的性能对计算机的影响非常大。 内存（Memory）也被称为内存储器，其作用是用于暂时存放CPU中的运算数据，以及与硬盘等外部存储器交换的数据<br>辅存：狭义上就是我们所说的硬盘，即外部存储器，存储容量大，比如说有磁存储器，光盘存储器等等。</p>
+</blockquote>
+<p><strong>2.举例说明：</strong></p>
+<ul>
+<li><p>主存-RAM：RAM主要有电容器进行数据的存储，必须每隔一段时间都需要刷新一次，如果断电的化，数据就会丢失。</p>
+</li>
+<li><p>辅存-磁盘：磁盘表面是可磁化的磁特性材料，可以移动磁头径向运动来获取磁道上面的信息。<br><img src="https://pic002.cnblogs.com/images/2012/295881/2012052117213095.gif" alt></p>
+</li>
+</ul>
+<p><strong>3.磁盘访问算法：</strong>假设上图的磁头在第四磁道，从内向外以此为1，2，3，4，5，6磁道，磁头径向为内-&gt;外。<br>假设我们要访问1，4，5，2，3磁道</p>
+<ul>
+<li><p>先来先服务算法：根据我们需要访问磁道的顺序依次访问，谁先在前面就访问谁，因此访问顺序为1，4，5，2，3</p>
+</li>
+<li><p>最短寻道算法：顾名思义，就是寻找附件距离最短的磁道，因此访问顺序为：4 5 3 2 1</p>
+</li>
+<li><p>扫描算法：每次扫描只往一个方向移动，达到所需服务尽头的时候，返回，即反方向移动。因此访问顺序为：4 5 3 2 1</p>
+</li>
+<li><p>循环扫描算法：只往一个方向读取，到达尽头，从另外一边尽头继续按照原方向访问，访问顺序为：4 3 2 1 5</p>
+</li>
+</ul>
+<h3 id="高速缓存"><a href="#高速缓存" class="headerlink" title="高速缓存"></a>高速缓存</h3><p>1.了解：</p>
+<ul>
+<li><p>字：存放在一个存储单元当中的二进制组合</p>
+</li>
+<li><p>字块：连续的存储单元，包换多个字</p>
+</li>
+<li><p>字的地址：前m位是字块的地址，后b位是字在字块中的地址</p>
+</li>
+</ul>
+<p><strong>2.命中率和访问效率：</strong></p>
+<ul>
+<li><p>命中率：衡量缓存性能的重要指标<br>设命中率位h，访问缓存的次数位Nc,访问主存的次数位Nm，则h=Nc/(NC+Nm)</p>
+</li>
+<li><p>访问效率：假设访问缓存的时间位tc,访问主存的时间位tm，访问效率为e。<br>e=tc/(h<em>tc+(1-h)</em>tm),其中分母是平均访问时间。</p>
+</li>
+</ul>
+<p>为了提高命中率和访问效率，我们就得需要性能良好的缓存替换策略，让CPU需要的数据尽量在缓存当中。<br><strong>重点来聊！！！</strong><br><strong>3.缓存替换策略算法(面试考点)：</strong></p>
+<ul>
+<li><p>随机替换算法(比较简单，就是随机替换，博主就略过了)</p>
+</li>
+<li><p>先进先出算法(FIFO算法)：把高速缓存看作是一个先进先出的队列，当需要替换时，优先替换最先进入的字块，就是出队。<br><img src="https://images0.cnblogs.com/i/221914/201407/082202026607080.png" alt><br>代码样例:</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line">from DoubleList.DoubleList import DoubleList,Node  &#x2F;&#x2F;自己先前写了一个双向链表和节点Node类</span><br><span class="line">class FIFO:</span><br><span class="line">    def __init__(self,capacity):</span><br><span class="line">        self.capacity&#x3D;capacity</span><br><span class="line">        self.size&#x3D;0</span><br><span class="line"></span><br><span class="line">        self.map&#x3D;&#123;&#125;                       &#x2F;&#x2F;缓存映射到map当中</span><br><span class="line">        self.list&#x3D;DoubleList(self.capacity)</span><br><span class="line">    def get(self,key):       #返回对应key值所对应的value</span><br><span class="line">        if key not in self.map:          &#x2F;&#x2F;如果找的key值不在缓存当中</span><br><span class="line">            return  -1</span><br><span class="line">        else:</span><br><span class="line">            node &#x3D; self.map.get(key)    &#x2F;&#x2F;如果在缓存当中，则返回key对应的value值</span><br><span class="line">            return node.value</span><br><span class="line">    def put(self,key,value):</span><br><span class="line">        if self.capacity&#x3D;&#x3D;0:</span><br><span class="line">            return</span><br><span class="line">        if key in self.map:              &#x2F;&#x2F;如果需要的数据已经在缓存当中了，那么就将原来的删掉，并且移到最后面去。</span><br><span class="line">            node&#x3D;self.map.get(key)</span><br><span class="line">            self.list.remove(node)</span><br><span class="line">            node.value&#x3D;value</span><br><span class="line">            self.list.append(node)</span><br><span class="line">        else:</span><br><span class="line">            if self.size&#x3D;&#x3D;self.capacity:       &#x2F;&#x2F;如果缓存当中没有并且缓存满了，淘汰最前面的，也就是最近最少出现的数据，并且把需要的数据加入到后面</span><br><span class="line">                node &#x3D; self.list.pop()</span><br><span class="line">                del self.map[node.key]</span><br><span class="line">                self.size-&#x3D;1</span><br><span class="line">            node&#x3D;Node(key,value)              &#x2F;&#x2F;如果缓存没满，直接往后面加入数据</span><br><span class="line">            self.list.append(node)</span><br><span class="line">            self.map[key]&#x3D;node</span><br><span class="line">            self.size+&#x3D;1</span><br><span class="line">    def print(self):</span><br><span class="line">        self.list.print()</span><br><span class="line">if __name__&#x3D;&#x3D;&#39;__main__&#39;:</span><br><span class="line">    cache&#x3D; FIFO(2)</span><br><span class="line">    cache.put(1,1)</span><br><span class="line">    cache.print()</span><br><span class="line">    cache.put(2,2)</span><br><span class="line">    cache.print()</span><br><span class="line">    print(cache.get(1))</span><br><span class="line">    cache.put(3,3)</span><br><span class="line">    cache.print()</span><br><span class="line">    print(cache.get(2))</span><br><span class="line">    cache.print()</span><br><span class="line">    cache.put(4,4)</span><br><span class="line">    cache.print()</span><br><span class="line">    print(cache.get(1))</span><br></pre></td></tr></table></figure>
+<p>大家也可以验证一下，如果说有兴趣的话，读者可以自己按照这个思路用Java，C++或者python语言重新实现一下。</p>
+<ul>
+<li>最近最少使用算法(LRU算法)：优先淘汰一段时间内没有使用的字块，一般使用双向链表实现，实现的时候，要把当前访问的节点置于链表最前面，而链表最后的就是最近最少使用的节点。<br>代码实现：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"># ! _*_ encoding&#x3D;utf-8 _*_</span><br><span class="line">from DoubleList.DoubleList import DoubleList,Node</span><br><span class="line"></span><br><span class="line">class LRU:</span><br><span class="line">    def __init__(self,capacity):</span><br><span class="line">        self.capacity&#x3D;capacity</span><br><span class="line">        self.size&#x3D;0</span><br><span class="line">        self.map&#x3D;&#123;&#125;</span><br><span class="line">        self.list&#x3D;DoubleList(self.capacity)</span><br><span class="line">    def get(self,key):</span><br><span class="line">        if key in self.map:              &#x2F;&#x2F;如果访问的节点在缓存里面已经有，则置前</span><br><span class="line">            node &#x3D; self.map[key]</span><br><span class="line">            self.list.remove(node)</span><br><span class="line">            self.list.append_front(node)</span><br><span class="line">            return node.value</span><br><span class="line"></span><br><span class="line">        else:</span><br><span class="line">            return -1</span><br><span class="line">    def put(self,key,value):</span><br><span class="line">        if key in self.map:              &#x2F;&#x2F;置前操作</span><br><span class="line">            node &#x3D; self.map[key]</span><br><span class="line">            self.list.remove(node)</span><br><span class="line">            node.value&#x3D;value</span><br><span class="line">            self.list.append_front(node)</span><br><span class="line">        else:                           &#x2F;&#x2F;淘汰最近最少使用的节点，把当前节点加入到最前面。</span><br><span class="line">            node &#x3D; Node(key,value)</span><br><span class="line">            if self.list.size &gt;&#x3D;self.capacity:</span><br><span class="line">                node1&#x3D;None</span><br><span class="line">                oldNode &#x3D; self.list.remove(node1)</span><br><span class="line">                self.map.pop(oldNode.key)</span><br><span class="line"></span><br><span class="line">            self.list.append_front(node)</span><br><span class="line">            self.map[key] &#x3D; node</span><br><span class="line">    def print(self):</span><br><span class="line">        self.list.print()</span><br><span class="line">if __name__ &#x3D;&#x3D;&#39;__main__&#39;:</span><br><span class="line">    cache &#x3D; LRU(2)</span><br><span class="line">    cache.put(1,1)</span><br><span class="line">    cache.print()</span><br><span class="line">    cache.put(2,2)</span><br><span class="line">    cache.print()</span><br><span class="line">    cache.put(3,3)</span><br><span class="line">    cache.print()</span><br><span class="line">    cache.get(2)</span><br><span class="line">    cache.print()</span><br><span class="line">    cache.get(3)</span><br><span class="line">    cache.print()</span><br><span class="line">    cache.get(1)</span><br><span class="line">    cache.print()</span><br><span class="line">    print(cache.get(1))</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>最不经常使用算法(LFU算法)：优先淘汰最不经常使用的节点，那怎么判断是否最不经常使用呢，我们需要额外的空间记录字块的使用频率，即在节点类里面加一个属性(使用频率)即可，至于代码怎么实现就比较简单了，博主就不一一实现了。</li>
+</ul>
+<h2 id="计算机指令系统"><a href="#计算机指令系统" class="headerlink" title="计算机指令系统"></a>计算机指令系统</h2><p>1.机器指令：主要由操作码，地址码组成。前者指明指令需要完成的操作，后者给出操作数的地址或者直接给出操作数。而这个地址指令可以分为三地址指令，二地址指令，一地址指令和零地址指令。</p>
+<ul>
+<li>三地址指令：就是把第一个地址和第二个地址的数据进行相应的OP操作，操作之后得到的结构放入到addr3当中</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>操作码(OP)</th>
+<th>addr1</th>
+<th>addr2</th>
+<th>addr3</th>
+</tr>
+</thead>
+</table>
+<ul>
+<li>二地址指令：就是把第一个地址和第二个地址的数据进行相应的OP操作，操作之后得到的结构放入到addr1或者addr2当中</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>操作码(OP)</th>
+<th>addr1</th>
+<th>addr2</th>
+</tr>
+</thead>
+</table>
+<ul>
+<li>一地址指令：就是把该地址的数据进行相应的OP操作，操作之后得到的结构放入到自身地址当中</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>操作码(OP)</th>
+<th>addr1</th>
+</tr>
+</thead>
+</table>
+<ul>
+<li>零地址指令：在指令当中无地址码，一般都是进行一些空操作，停机操作或者中断返回操作等等。</li>
+</ul>
+<p>2.机器指令的操作类型：数据传输，算术逻辑，移位逻辑，控制指令。</p>
+<p>3.寻址方式：</p>
+<ul>
+<li><p>指令寻址：分为顺序寻址和跳跃寻址。前者就是按照地址的顺序依次查找下去，后者则是查找过程中遇到了JMP条约指令，条约到指定的地址。</p>
+</li>
+<li><p>数据寻址：分为立即寻址(指令里直接给出操作数，无需通过地址，寻址速度快，但是地址码的位数限制了操作数的范围)，直接寻址(即直接给出操作数在内存当中的地址，使得寻找操作数简单，但是地址码的位数限制了操作数地址码的范围)，间接寻址(即给出了操作数地址的地址，需要经过多次寻址，这可以使得范围更加大，但是速度较慢)</p>
+</li>
+</ul>
+<h2 id="控制器"><a href="#控制器" class="headerlink" title="控制器"></a>控制器</h2><p>1.组成：程序计数器，时序发生器，指令译码器，各种寄存器(通用寄存器，指令寄存器，主存数据寄存器，主存地址寄存器)，总线。</p>
+<ul>
+<li><p>程序计数器：存储下一条指令的地址，循环从中拿出指令，指令被拿出时，指向下一条指令。</p>
+</li>
+<li><p>时序发生器：可以发射时序脉冲，使得CPU工作更加有节奏</p>
+</li>
+<li><p>指令译码器：翻译操作码对应的操作，控制传输地址码对应的数据</p>
+</li>
+<li><p>指令寄存器：从主存或者缓存当中取出指令，使CPU高速高效运转</p>
+</li>
+<li><p>通用寄存器：保存ALU运算的中间结果，暂时存放或者传送该数据，并且等待下一个控制信号，把数据送到指定位置。<br>另外两个通俗易懂，顾名思义，就不多说了。</p>
+</li>
+</ul>
+<h2 id="运算器"><a href="#运算器" class="headerlink" title="运算器"></a>运算器</h2><p>1.组成：数据缓存器，ALU，通用寄存器，状态字寄存器，总线。</p>
+<ul>
+<li><p>数据缓存器：分为输入缓存和输出缓存，暂时存放送入的数据和送出的数据，并且等待下一条指令，把该数据送往指定位置。</p>
+</li>
+<li><p>ALU：算数逻辑单元，可以进行移位逻辑运算和其它运算。</p>
+</li>
+<li><p>状态字缓存器：可以存放各种状态，比如说符号，条件码，进位，溢出等等，还可以存放运算控制信息。</p>
+</li>
+</ul>
+<h2 id="指令执行过程"><a href="#指令执行过程" class="headerlink" title="指令执行过程"></a>指令执行过程</h2><p>分为三个阶段，取指-&gt;分析指令-&gt;执行指令<br>取指令的任务是：根据程序计数器PC中的值从程序存储器读出现行指令，送到指令寄存器。</p>
+<p>分析指令阶段的任务是：将指令寄存器中的指令操作码取出后进行译码，分析其指令性质。如指令要求操作数，则寻找操作数地址。<br>计算机执行程序的过程实际上就是逐条指令地重复上述操作过程，直至遇到停机指令可循环等待指令。</p>
+<p>一般计算机进行工作时，首先要通过外部设备把程序和数据通过输入接口电路和数据总线送入到存储器，然后逐条取出执行。但单片机<br>中的程序一般事先我们都已通过<br>写入器固化在片内或片外程序存储器中。因而一开机即可执行指令。</p>
+<h1 id="计算机当中的数值及其表示"><a href="#计算机当中的数值及其表示" class="headerlink" title="计算机当中的数值及其表示"></a>计算机当中的数值及其表示</h1><h2 id="进制运算"><a href="#进制运算" class="headerlink" title="进制运算"></a>进制运算</h2><p>1.进制：一种计数方式，有限种数字符号来表示无限的数值，使用的数字符号的数目就是进位制的基数。</p>
+<p>2.常见进制：二进制，八进制，十进制，十六进制等等。</p>
+<p>3.进制之间的转换(相信大家耳熟能详，博主就不展开叙述了)</p>
+<h2 id="有符号数和无符号数及其表示法"><a href="#有符号数和无符号数及其表示法" class="headerlink" title="有符号数和无符号数及其表示法"></a>有符号数和无符号数及其表示法</h2><p>1.概述：在计算机当中，没有’+’和’-‘两种符号，它认识的是0和1，因此在计算机里面，使用0来表示正数，使用1来表示负数。符号位放最前面，其它为数值位。</p>
+<p>2.原码表示法：符号位放第一位，其它为数值的二进制。原码表示法比较简单，但是在进行运算的时候非常复杂，特别是异号运算。因此比较少用它来计算。</p>
+<p>3.反码表示法：原码除符号位以外，若为负数则其它数值位按位取反，若为正数则不变.可以通过反码找出其与补码之间的关系，从而方便计算补码。</p>
+<p>4.补码表示法：对应原码的反码+1，便于运算。</p>
+<h2 id="定点数与浮点数"><a href="#定点数与浮点数" class="headerlink" title="定点数与浮点数"></a>定点数与浮点数</h2><p>1.定点数的表示：小数点固定在某个位置。其只有两种类型，一种是纯小数，小数点在符号位与数值位之间，一种是纯整数，小数点位于最后面。若遇到整数小数混合型的，则必须乘以相关比例把该数化成纯整数或者纯小数。</p>
+<p>2.浮点数的表示：浮点数的表示范围比较大</p>
+<ul>
+<li><p>格式：N=S*R^j   其中S指尾数，R指基数，j指阶码。</p>
+</li>
+<li><p>范围：若阶码取m位，尾数取n位，则阶码能够表示的最大值位2^m-1,范围为[-2^m+1,2^m-1]。尾数的表示范围为：[2^(-n),1-2^(-n)]并上[2^(-n)-1,-2^(-n)]，</p>
+</li>
+</ul>
+<p>其中，如果出现了绝对值较小但是不在范围当中则称为下溢，如果绝对值较大并且不在范围当中则为上溢。</p>
+<p>3.浮点数的规格化：</p>
+<ul>
+<li><p>尾数必须为纯小数</p>
+</li>
+<li><p>尾数最高位必须为1</p>
+</li>
+</ul>
+<p>4.二者对比区别：</p>
+<ul>
+<li><p>位数相同时，浮点数的表示范围比定点数大</p>
+</li>
+<li><p>浮点数的精度更加高</p>
+</li>
+<li><p>但是浮点数的运算更加复杂</p>
+</li>
+</ul>
+<p><strong>5.定点数的加减运算：</strong>数值位与符号位一同运算，进位则舍弃，得到补码以后，使用’+’,’-‘符号来代替符号位，并且对数值位按位取反加一。</p>
+<ul>
+<li><p>需要注意的是，溢出判断，我们一般采用的是双符号判断法，符号位由单符号改成双符号位，比如说0-&gt;00,1-&gt;11，运算过程当中，双符号位产生的进位丢弃，如果说双符号位不同，则产生溢出。</p>
+</li>
+<li><p>减法运算则需要把减号和对应数值转换成补码进行计算</p>
+</li>
+</ul>
+<p><strong>6.浮点数的加减乘除运算：</strong></p>
+<ul>
+<li><p>操作流程：对阶(使浮点数的阶码一致)-&gt;尾数求和-&gt;尾数规格化-&gt;舍入-&gt;溢出判断</p>
+</li>
+<li><p>尾数规格化：需要判断尾数大于0和小于0的情况，规格化时，数值位最高位要与符号位不一致，如果不满足该情况，则左移，同时阶码发生相应的变化，如果左移使得发生溢出，则右移并且0舍1入。</p>
+</li>
+<li><p>乘法：阶码相加，尾数相乘</p>
+</li>
+<li><p>除法：阶码相减，尾数相除。</p>
+</li>
+</ul>
+<h1 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h1><p>  计算机原理是大学里面的核心课，也是CS专业的基础课，各大公司招聘面试时考核的重点，希望能够给大家带来收获！！！</p>
+</article><!-- lincense--><div class="license-wrapper"><p> <span>Author:  </span><a href="http://liujunchi-bot.github.io">John Doe</a></p><p> <span>Link:  </span><a href="http://liujunchi-bot.github.io/2020/01/03/Computer/">http://liujunchi-bot.github.io/2020/01/03/Computer/</a></p><p> <span>Copyright:  </span><span>All articles in this blog are licensed under <a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-nd/3.0" target="_blank">CC BY-NC-SA 3.0</a> unless stating additionally.</span></p></div><div class="post-paginator"><a class="prevSlogan" href="/2020/01/15/%E5%BF%AB%E9%80%9F%E6%90%9E%E5%AE%9A%E5%9F%BA%E4%BA%8Egithub%E7%9A%84hexo%E4%B8%BB%E9%A2%98%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2%E7%BD%91%E7%AB%99/" title="快速搞定基于github的hexo主题个人博客网站"><span>< PreviousPost</span><br><span class="prevTitle">快速搞定基于github的hexo主题个人博客网站</span></a><div class="clear"></div></div><div id="comment"><div id="container"></div><link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css"><script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script><script>var gitment = new Gitment({
+  //- id: '吃透计算机组成原理',
+  //- owner: 'liujunchi-bot',
+  //- repo: 'Blog-Comment',
+  //- oauth: {
+  //-   client_id: 'fcc11412ea5eb9310de3',
+  //-   client_secret: 'fb83a32085e0e8570fd37c38d4909a2436776fde',
+  //- },
+  id: '{% raw %}{{ page.date }}{% endraw %}',
+  owner: 'liujunchi-bot',
+  repo: 'Blog-Comment',
+  oauth: {
+    client_id: 'fcc11412ea5eb9310de3',
+    client_secret: 'fb83a32085e0e8570fd37c38d4909a2436776fde',
+  },
+})
+gitment.render('container')</script></div></section></article><footer id="cxo-footer-outer"><div id="cxo-footer-inner"><p class="footer-container"><span>Site by </span><a href="http://hexo.io" target="_blank" rel="noopener"><span>Hexo</span></a><span> | theme </span><a href="https://github.com/Longlongyu/hexo-theme-Cxo" target="_blank" rel="noopener"><span>Cxo</span></a></p><i class="fa fa-user"> </i><span id="busuanzi_value_site_uv"></span><span> | </span><i class="fa fa-eye"> </i><span id="busuanzi_value_site_pv"></span></div></footer><!-- catelog--><div class="toc-wrapper" style="top: 70vh;"><div class="toc-catalog"><i class="fa fa-list"> </i><span>CATALOG</span></div><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#博主杂谈"><span class="toc-number">1.</span> <span class="toc-text">博主杂谈</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#计算机概论"><span class="toc-number">2.</span> <span class="toc-text">计算机概论</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#计算机发展历程"><span class="toc-number">2.1.</span> <span class="toc-text">计算机发展历程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#计算机的分类"><span class="toc-number">2.2.</span> <span class="toc-text">计算机的分类</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#计算机的结构体系"><span class="toc-number">2.3.</span> <span class="toc-text">计算机的结构体系</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#冯诺依曼体系"><span class="toc-number">2.3.1.</span> <span class="toc-text">冯诺依曼体系</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#现代计算机体系"><span class="toc-number">2.3.2.</span> <span class="toc-text">现代计算机体系</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#计算机的层次与编程语言"><span class="toc-number">3.</span> <span class="toc-text">计算机的层次与编程语言</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#程序翻译与程序解释"><span class="toc-number">3.1.</span> <span class="toc-text">程序翻译与程序解释</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#计算机层次"><span class="toc-number">3.2.</span> <span class="toc-text">计算机层次</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#计算机计算单位与字符编码"><span class="toc-number">4.</span> <span class="toc-text">计算机计算单位与字符编码</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#计算机计算单位"><span class="toc-number">4.1.</span> <span class="toc-text">计算机计算单位</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#计算机字符编码"><span class="toc-number">4.2.</span> <span class="toc-text">计算机字符编码</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#字符编码种类与历程"><span class="toc-number">4.2.1.</span> <span class="toc-text">字符编码种类与历程</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#计算机内部结构"><span class="toc-number">5.</span> <span class="toc-text">计算机内部结构</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#计算机总线"><span class="toc-number">5.1.</span> <span class="toc-text">计算机总线</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#计算机的输入输出设备"><span class="toc-number">5.2.</span> <span class="toc-text">计算机的输入输出设备</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#存储器"><span class="toc-number">5.3.</span> <span class="toc-text">存储器</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#主存与辅存"><span class="toc-number">5.3.1.</span> <span class="toc-text">主存与辅存</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#高速缓存"><span class="toc-number">5.3.2.</span> <span class="toc-text">高速缓存</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#计算机指令系统"><span class="toc-number">5.4.</span> <span class="toc-text">计算机指令系统</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#控制器"><span class="toc-number">5.5.</span> <span class="toc-text">控制器</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#运算器"><span class="toc-number">5.6.</span> <span class="toc-text">运算器</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#指令执行过程"><span class="toc-number">5.7.</span> <span class="toc-text">指令执行过程</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#计算机当中的数值及其表示"><span class="toc-number">6.</span> <span class="toc-text">计算机当中的数值及其表示</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#进制运算"><span class="toc-number">6.1.</span> <span class="toc-text">进制运算</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#有符号数和无符号数及其表示法"><span class="toc-number">6.2.</span> <span class="toc-text">有符号数和无符号数及其表示法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#定点数与浮点数"><span class="toc-number">6.3.</span> <span class="toc-text">定点数与浮点数</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#结语"><span class="toc-number">7.</span> <span class="toc-text">结语</span></a></li></ol></div><!-- top--><i class="fa fa-arrow-up close" id="go-up" aria-hidden="true"></i></body></html>

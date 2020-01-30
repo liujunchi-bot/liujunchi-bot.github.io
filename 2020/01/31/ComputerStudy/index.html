@@ -1,0 +1,122 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"><meta name="author" content="John Doe"><meta name="renderer" content="webkit"><meta name="copyright" content="John Doe"><meta name="keywords" content="Hexo"><meta name="description" content=""><meta name="Cache-Control" content="no-cache"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><title>计算机组成原理小测 · Mr.Liu's Blog</title><link rel="stylesheet" href="/css/style.css?v=2018.7.9"><link rel="stylesheet" href="/css/animation.css?v=2018.7.9"><link rel="icon" href="/img/assets/favicon.ico"><link rel="stylesheet" href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css?version=1.5.6"><!-- scripts--><script>(function( w ){
+  "use strict";
+  // rel=preload support test
+  if( !w.loadCSS ){
+    w.loadCSS = function(){};
+  }
+  // define on the loadCSS obj
+  var rp = loadCSS.relpreload = {};
+  // rel=preload feature support test
+  // runs once and returns a function for compat purposes
+  rp.support = (function(){
+    var ret;
+    try {
+      ret = w.document.createElement( "link" ).relList.supports( "preload" );
+    } catch (e) {
+      ret = false;
+    }
+    return function(){
+      return ret;
+    };
+  })();
+
+  // if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+  // then change that media back to its intended value on load
+  rp.bindMediaToggle = function( link ){
+    // remember existing media attr for ultimate state, or default to 'all'
+    var finalMedia = link.media || "all";
+
+    function enableStylesheet(){
+      link.media = finalMedia;
+    }
+
+    // bind load handlers to enable media
+    if( link.addEventListener ){
+      link.addEventListener( "load", enableStylesheet );
+    } else if( link.attachEvent ){
+      link.attachEvent( "onload", enableStylesheet );
+    }
+
+    // Set rel and non-applicable media type to start an async request
+    // note: timeout allows this to happen async to let rendering continue in IE
+    setTimeout(function(){
+      link.rel = "stylesheet";
+      link.media = "only x";
+    });
+    // also enable media after 3 seconds,
+    // which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+    setTimeout( enableStylesheet, 3000 );
+  };
+
+  // loop through link elements in DOM
+  rp.poly = function(){
+    // double check this to prevent external calls from running
+    if( rp.support() ){
+      return;
+    }
+    var links = w.document.getElementsByTagName( "link" );
+    for( var i = 0; i < links.length; i++ ){
+      var link = links[ i ];
+      // qualify links to those with rel=preload and as=style attrs
+      if( link.rel === "preload" && link.getAttribute( "as" ) === "style" && !link.getAttribute( "data-loadcss" ) ){
+        // prevent rerunning on link
+        link.setAttribute( "data-loadcss", true );
+        // bind listeners to toggle media back
+        rp.bindMediaToggle( link );
+      }
+    }
+  };
+
+  // if unsupported, run the polyfill
+  if( !rp.support() ){
+    // run once at least
+    rp.poly();
+
+    // rerun poly on an interval until onload
+    var run = w.setInterval( rp.poly, 500 );
+    if( w.addEventListener ){
+      w.addEventListener( "load", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    } else if( w.attachEvent ){
+      w.attachEvent( "onload", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    }
+  }
+
+
+  // commonjs
+  if( typeof exports !== "undefined" ){
+    exports.loadCSS = loadCSS;
+  }
+  else {
+    w.loadCSS = loadCSS;
+  }
+}( typeof global !== "undefined" ? global : this ) );</script><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" defer></script><script src="/js/main.js?v=2018.7.9" defer></script><!-- fancybox--><link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" defer></script><!-- busuanzi--><script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script><meta name="generator" content="Hexo 4.2.0"></head><body><section class="profile-close" id="cxo-profile"><div class="profile-avatar"><i class="fa fa-caret-left"></i><img src="https://dss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=1525175323,4282711120&amp;fm=26&amp;gp=0.jpg"></div><!--.profile-saying
+  i.fa.fa-comment
+  .saying--><div class="cxo-profile-inner"><div class="profile-name">行者自远</div><div class="profile-signature">码出行云流水般的感觉</div><div class="friends"><div>FRIENDS</div><span><a href="liujunchi-bot.github.io" target="_black">mygithub</a></span></div><div class="read-progress"></div></div></section><header id="cxo-intro" style="height: 70vh;background-image: url(https://timgsa.baidu.com/timg?image&amp;quality=80&amp;size=b9999_10000&amp;sec=1579025644130&amp;di=91083c502a018151c4baf71913b3c3fd&amp;imgtype=0&amp;src=http%3A%2F%2Fcdn.duitang.com%2Fuploads%2Fitem%2F201303%2F10%2F20130310192322_dCEtP.jpeg);"><nav id="cxo-intro-nav"><section><div class="intro-nav-title"><a href="/">Mr.Liu's Blog</a></div><div class="intro-nav-label-box"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a><a href="/categories/">Categories</a></div><i class="fa fa-bars intro-nav-menu"><div class="intro-nav-drop"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a><a href="/categories/">Categories</a></div></i><div class="clear"></div></section></nav><h1 class="post-title">计算机组成原理小测</h1><div class="post-intros"><div class="post-intro-meta"><span class="post-intro-time"><i class="post-intro-calendar fa fa-edit"></i><span>2020-01-31</span></span><span class="post-intro-tags"><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="Basics"> Basics</a></span></div><div class="post-intro-read"><span> Word count: <span class="post-count">2.3k</span> | Reading time: <span class="post-count">7</span>min</span></div></div></header><article class="cxo-up" id="cxo-content-outer"><section id="cxo-content-inner"><article class="article-entry" id="post"><p>1.你了解冯诺依曼机吗？你是否可以大概描述冯诺依曼机的基本组成和工作原理？冯诺依曼机相对于之前的计算机有什么重要改进？<br>答：了解，冯诺依曼机由运算器，控制器，存储器，输入设备，输出设备组成，工作原理：采用二进制，程序指令和数据一起存储。按程序编排的顺序，一步一步地取出指令，自动地完成指令规定的操作，相对于之前的计算机，冯诺依曼机可以做到轻易改变程序，设计通用电路，更加有弹性方便。<br>2.什么是冯诺依曼瓶颈？冯诺依曼瓶颈对现代计算机产生了什么影响？<br>答：冯诺依曼瓶颈就是计算机当中的CPU与存储器分开，CPU的运算速度较快，但是传输给存储器的速度相对较慢，CPU经常空转等待数据传输，浪费了资源。影响：让CPU与存储器结合起来，根据速度性能问题，促使了缓存架构的开发。<br>3.你了解程序解释和程序翻译吗？如果让你口述解释和翻译的区别，你会怎么去描述？尝试说明高级语言、汇编语言和机器语言的关系？<br>答：了解， 程序翻译是一种高级计算机语言的程序直接翻译生成新的低级语言程序，而程序解释则不用，并且程序解释是由低级语言编写的解释器将高级语言的程序作为输入，解释一句计算机就执行一句，不生成目标程序。<br>高级语言可以通过编译生成汇编语言，汇编语言可以通过汇编生成机器语言，而机器语言可以直接被机器认识并且执行。</p>
+<p>4.你是否可以列出几种除课程提及以外的解释型语言？是否可以列出几种除课程提及以外的编译型语言？<br>解释型语言：python<br>编译型语言：C,C++<br>5.现代计算机的总线都是集成在计算机主板里面的，你是否可以说出总线主要的功能和分类？<br>总线的主要功能：解决不同设备之间通信的问题<br>A.提供了对外连接的接口<br>B.不同设备可以通过此进行连接<br>C.促使外部接口统一<br>分类：<br>片内总线和系统总线(数据总线，地址总线，控制总线)<br>6.请解释概念：主存、辅存、Cache、RAM、ROM？<br>主存：主存，又称内存，是计算机中重要的部件之一，它是与CPU进行沟通的桥梁。计算机中所有程序的运行都是在内存中进行的，因此内存的性能对计算机的影响非常大。 内存（Memory）也被称为内存储器，其作用是用于暂时存放CPU中的运算数据，以及与硬盘等外部存储器交换的数据<br>辅存：狭义上就是我们所说的硬盘，即外部存储器，存储容量大，比如说有磁存储器，光盘存储器等等。<br>Cache：一种特殊的存储系统，复制了频繁使用的数据以便于快速访问，但是容量较小<br>RAM：随机存取存储器，主要用于存储计算机运行时的数据和程序<br>ROM：只读存储器，只能从设备中读取数据，但是不能写数据。<br>7. 你是否可以清晰的表述计算机存储器的层次结构？存储器的层次结构是为了解决什么问题的？<br>计算机的层次结构自底向顶为：硬件逻辑层，微程序机器层，传统机器层(这三个偏硬件，为实际机器层)，操作系统层，汇编语言层，高级语言层，应用层(这四个为虚拟机器层，前三个为系统软件层，最后一个为应用软件层)。<br>存储结构的层次结构主要有主存-缓存结构和主存-辅存结构，它们分别是解决主存速度不足和容量不足问题。<br>8. 假设CPU执行某段程序共计访问Cache命中4800次，访问主存200次，已知Cache的存取周期是30ns，主存的存取周期是150ns，求Cache-主<br>系统的平均访问时间和效率，试问该系统的性能提高了多少？<br>命中率=缓存访问次数/(缓存次数+主存访问次数)<br>系统平均访问时间=命中率<em>缓存访问时间+(1-命中率)</em>主存访问时间<br>效率=缓存访问时间/系统平均访问时间<br>9.一个指令执行的过程大概是怎么样的？为了提高CPU指令的执行效率，计算机提出了怎么样的设计？<br>A.分为三个阶段，取指-&gt;分析指令-&gt;执行指令<br>取指令的任务是：根据程序计数器PC中的值从程序存储器读出现行指令，送到指令寄存器。</p>
+<p>分析指令阶段的任务是：将指令寄存器中的指令操作码取出后进行译码，分析其指令性质。如指令要求操作数，则寻找操作数地址。<br>计算机执行程序的过程实际上就是逐条指令地重复上述操作过程，直至遇到停机指令可循环等待指令。</p>
+<p>一般计算机进行工作时，首先要通过外部设备把程序和数据通过输入接口电路和数据总线送入到存储器，然后逐条取出执行。但单片机<br>中的程序一般事先我们都已通过<br>写入器固化在片内或片外程序存储器中。因而一开机即可执行指令。<br>B.设计出了存储器的层次结构，在CPU处理程序的过程中，可以将下一步要执行的指令预加载并缓存。<br>10. 请简述IO设备与计算机的通讯方式，并尝试指出这几种通讯方式之间的区别和联系？<br>1.<br>.程序查询方式：是完全通过程序来控制主机和外围设备之间的信息传送。<br>通常的办法是在用户的程序中安排一段由输入输出指令和其他指令所组成的程序段直接控制外围设备的工作。也就是说CPU要不断地查询外围设备的工作状态，一旦外围设备“准备好”或“不忙”，即可进行数据的传送。<br>该方法是主机与外设之间进行数据交换的最简单、最基本的控制方法。<br>程序中断方式：当外围IO设备准备就绪的时候，向CPU发送中断信号，CPU有专门的电路响应中断信号。<br>DMA方式：在外围设备和主存之间开辟直接的数据通路。在正常工作时，所有的工作周期均用于执行CPU的程序。当外围设备完成I/O的准备工作后，占用CPU的工作周期，和主存直接交换数据。完成后，CPU又继续控制总线，执行原程序。<br>完成这项工作的是系统中增设的DMA控制器。</p>
+<p>2.前两种以CPU为核心，后一种以内存为核心，不需要CPU参与，中断方式是对I/O准备做出改进，它不需要CPU不断查询来确认外设状态，而是引入了中断机制，在I/O准备好后，通过中断请求通知CPU，而在外设准备阶段，CPU是可以执行原来的主程序，也就是说CPU只参与数据传送阶段。而DMA方式更是将数据传送阶段也给省了，将数据传送的工作交给DMA控制器，使得CPU更加专注于主程序的执行</p>
+<p>10.计算机直接使用原码计算有什么缺点，为此提出什么码表示法？你知道求补码的简便方法吗？<br>缺点：原码进行计算比较复杂，特别是不同符号之间的运算。<br>提出了补码表示法<br>求补码的简单方法就是原码的反码加一<br>12. 尝试找出几个你喜欢的数字并将其原码、补码求出来，并将其使用32位定点表示法和32位浮点表示法(1位符号位、8位阶码、23位数值位)表示<br>来。<br>略。<br>13.计算机为了判断运算溢出使用了什么方法？你是否了解浮点数的上溢和下溢？计算int型、long型所能表达的最大值，最小值。<br>判断运算溢出：使用双符号位，计算时若双符号不同，则溢出。<br>上溢：绝对值大于指定范围<br>下溢：绝对值小于指定范围</p>
+</article><!-- lincense--><div class="license-wrapper"><p> <span>Author:  </span><a href="http://liujunchi-bot.github.io">John Doe</a></p><p> <span>Link:  </span><a href="http://liujunchi-bot.github.io/2020/01/31/ComputerStudy/">http://liujunchi-bot.github.io/2020/01/31/ComputerStudy/</a></p><p> <span>Copyright:  </span><span>All articles in this blog are licensed under <a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-nd/3.0" target="_blank">CC BY-NC-SA 3.0</a> unless stating additionally.</span></p></div><div class="post-paginator"><a class="nextSlogan" href="/2020/01/15/%E5%BF%AB%E9%80%9F%E6%90%9E%E5%AE%9A%E5%9F%BA%E4%BA%8Egithub%E7%9A%84hexo%E4%B8%BB%E9%A2%98%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2%E7%BD%91%E7%AB%99/" title="快速搞定基于github的hexo主题个人博客网站"><span>NextPost ></span><br><span class="nextTitle">快速搞定基于github的hexo主题个人博客网站</span></a><div class="clear"></div></div><div id="comment"><div id="container"></div><link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css"><script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script><script>var gitment = new Gitment({
+  //- id: '计算机组成原理小测',
+  //- owner: 'liujunchi-bot',
+  //- repo: 'Blog-Comment',
+  //- oauth: {
+  //-   client_id: 'fcc11412ea5eb9310de3',
+  //-   client_secret: 'fb83a32085e0e8570fd37c38d4909a2436776fde',
+  //- },
+  id: '{% raw %}{{ page.date }}{% endraw %}',
+  owner: 'liujunchi-bot',
+  repo: 'Blog-Comment',
+  oauth: {
+    client_id: 'fcc11412ea5eb9310de3',
+    client_secret: 'fb83a32085e0e8570fd37c38d4909a2436776fde',
+  },
+})
+gitment.render('container')</script></div></section></article><footer id="cxo-footer-outer"><div id="cxo-footer-inner"><p class="footer-container"><span>Site by </span><a href="http://hexo.io" target="_blank" rel="noopener"><span>Hexo</span></a><span> | theme </span><a href="https://github.com/Longlongyu/hexo-theme-Cxo" target="_blank" rel="noopener"><span>Cxo</span></a></p><i class="fa fa-user"> </i><span id="busuanzi_value_site_uv"></span><span> | </span><i class="fa fa-eye"> </i><span id="busuanzi_value_site_pv"></span></div></footer><!-- catelog--><div class="toc-wrapper" style="top: 70vh;"><div class="toc-catalog"><i class="fa fa-list"> </i><span>CATALOG</span></div></div><!-- top--><i class="fa fa-arrow-up close" id="go-up" aria-hidden="true"></i></body></html>
