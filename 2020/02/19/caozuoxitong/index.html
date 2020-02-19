@@ -1,0 +1,935 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"><meta name="author" content="John Doe"><meta name="renderer" content="webkit"><meta name="copyright" content="John Doe"><meta name="keywords" content="Hexo"><meta name="description" content=""><meta name="Cache-Control" content="no-cache"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><title>玩转操作系统 · Mr.Liu's Blog</title><link rel="stylesheet" href="/css/style.css?v=2018.7.9"><link rel="stylesheet" href="/css/animation.css?v=2018.7.9"><link rel="icon" href="/img/assets/favicon.ico"><link rel="stylesheet" href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css?version=1.5.6"><!-- scripts--><script>(function( w ){
+  "use strict";
+  // rel=preload support test
+  if( !w.loadCSS ){
+    w.loadCSS = function(){};
+  }
+  // define on the loadCSS obj
+  var rp = loadCSS.relpreload = {};
+  // rel=preload feature support test
+  // runs once and returns a function for compat purposes
+  rp.support = (function(){
+    var ret;
+    try {
+      ret = w.document.createElement( "link" ).relList.supports( "preload" );
+    } catch (e) {
+      ret = false;
+    }
+    return function(){
+      return ret;
+    };
+  })();
+
+  // if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+  // then change that media back to its intended value on load
+  rp.bindMediaToggle = function( link ){
+    // remember existing media attr for ultimate state, or default to 'all'
+    var finalMedia = link.media || "all";
+
+    function enableStylesheet(){
+      link.media = finalMedia;
+    }
+
+    // bind load handlers to enable media
+    if( link.addEventListener ){
+      link.addEventListener( "load", enableStylesheet );
+    } else if( link.attachEvent ){
+      link.attachEvent( "onload", enableStylesheet );
+    }
+
+    // Set rel and non-applicable media type to start an async request
+    // note: timeout allows this to happen async to let rendering continue in IE
+    setTimeout(function(){
+      link.rel = "stylesheet";
+      link.media = "only x";
+    });
+    // also enable media after 3 seconds,
+    // which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+    setTimeout( enableStylesheet, 3000 );
+  };
+
+  // loop through link elements in DOM
+  rp.poly = function(){
+    // double check this to prevent external calls from running
+    if( rp.support() ){
+      return;
+    }
+    var links = w.document.getElementsByTagName( "link" );
+    for( var i = 0; i < links.length; i++ ){
+      var link = links[ i ];
+      // qualify links to those with rel=preload and as=style attrs
+      if( link.rel === "preload" && link.getAttribute( "as" ) === "style" && !link.getAttribute( "data-loadcss" ) ){
+        // prevent rerunning on link
+        link.setAttribute( "data-loadcss", true );
+        // bind listeners to toggle media back
+        rp.bindMediaToggle( link );
+      }
+    }
+  };
+
+  // if unsupported, run the polyfill
+  if( !rp.support() ){
+    // run once at least
+    rp.poly();
+
+    // rerun poly on an interval until onload
+    var run = w.setInterval( rp.poly, 500 );
+    if( w.addEventListener ){
+      w.addEventListener( "load", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    } else if( w.attachEvent ){
+      w.attachEvent( "onload", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    }
+  }
+
+
+  // commonjs
+  if( typeof exports !== "undefined" ){
+    exports.loadCSS = loadCSS;
+  }
+  else {
+    w.loadCSS = loadCSS;
+  }
+}( typeof global !== "undefined" ? global : this ) );</script><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" defer></script><script src="/js/main.js?v=2018.7.9" defer></script><!-- fancybox--><link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" defer></script><!-- busuanzi--><script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script><meta name="generator" content="Hexo 4.2.0"></head><body><section class="profile-close" id="cxo-profile"><div class="profile-avatar"><i class="fa fa-caret-left"></i><img src="https://dss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=1525175323,4282711120&amp;fm=26&amp;gp=0.jpg"></div><!--.profile-saying
+  i.fa.fa-comment
+  .saying--><div class="cxo-profile-inner"><div class="profile-name">行者自远</div><div class="profile-signature">码出行云流水般的感觉</div><div class="friends"><div>FRIENDS</div><span><a href="liujunchi-bot.github.io" target="_black">mygithub</a></span></div><div class="read-progress"></div></div></section><header id="cxo-intro" style="height: 70vh;background-image: url(https://timgsa.baidu.com/timg?image&amp;quality=80&amp;size=b9999_10000&amp;sec=1579025644130&amp;di=91083c502a018151c4baf71913b3c3fd&amp;imgtype=0&amp;src=http%3A%2F%2Fcdn.duitang.com%2Fuploads%2Fitem%2F201303%2F10%2F20130310192322_dCEtP.jpeg);"><nav id="cxo-intro-nav"><section><div class="intro-nav-title"><a href="/">Mr.Liu's Blog</a></div><div class="intro-nav-label-box"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a><a href="/categories/">Categories</a></div><i class="fa fa-bars intro-nav-menu"><div class="intro-nav-drop"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a><a href="/categories/">Categories</a></div></i><div class="clear"></div></section></nav><h1 class="post-title">玩转操作系统</h1><div class="post-intros"><div class="post-intro-meta"><span class="post-intro-time"><i class="post-intro-calendar fa fa-edit"></i><span>2020-02-19</span></span><span class="post-intro-tags"><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="Basics"> Basics</a></span></div><div class="post-intro-read"><span> Word count: <span class="post-count">14.3k</span> | Reading time: <span class="post-count">51</span>min</span></div></div></header><article class="cxo-up" id="cxo-content-outer"><section id="cxo-content-inner"><article class="article-entry" id="post"><h1 id="操作系统概述"><a href="#操作系统概述" class="headerlink" title="操作系统概述"></a>操作系统概述</h1><p>1.定义：操作系统是管理计算机硬件和软件资源的<strong>计算机程序</strong>。<br><strong>注意了！！！虽然说操作系统可以管理硬件资源，但是它其实是一个软件系统。总而言之，操作系统就是管理硬件，提供用户交互的软件系统，是硬件层和软件层的适配层</strong></p>
+<p>2.为什么要用操作系统这东西：</p>
+<ul>
+<li><p>我们对于硬件不能够直接的去操作，因此选择通过操作系统</p>
+</li>
+<li><p>像这些电脑，手机品牌很多，设备种类十分繁杂，操作系统则统一了界面，避免了这些繁杂的影响</p>
+</li>
+<li><p>操作系统的使用肯定可以带来极大的简便性，能够让更多的人去使用计算机，因此操作系统的出现也极大地促进了电脑，手机的普及</p>
+</li>
+</ul>
+<p>3.那操作系统有什么功能呢？</p>
+<ul>
+<li><p>可以统一的去管理计算机资源，比如说处理器资源，存储器资源，文件资源，IO设备资源。</p>
+</li>
+<li><p>可以实现计算机资源的抽象，即能够把那些所谓我们平时看不见的资源，抽象到各种软件接口上面去，比如说IO设备管理软件，文件管理软件，并且提供操作，读写文件的接口，能够让用户操作起来更加方便</p>
+</li>
+<li><p>可以提供用户与计算机的接口：图像窗口形式，命令形式(CMD)，系统调用形式(编程)</p>
+</li>
+</ul>
+<h3 id="操作系统相关概念"><a href="#操作系统相关概念" class="headerlink" title="操作系统相关概念"></a>操作系统相关概念</h3><ul>
+<li>并发性：这里所说的并发性就得和我们常听到的并行性给区分开来了。</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>并行</th>
+<th>两个或者多个事件在同一时刻发生</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>并发</td>
+<td>两个或者多个事件在同一时间间隔发生</td>
+</tr>
+<tr>
+<td>在操作系统当中的并发性就体现在<strong>多道程序在同一时间间隔内交替运行。</strong></td>
+<td></td>
+</tr>
+</tbody></table>
+<ul>
+<li>共享性：也就是说操作系统当中的资源可以供多个并发的程序共同使用(即进行资源共享)，程序A和程序B可以一起使用主存资源。<br>当然，资源共享也有两种不同的形式：</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>互斥共享</th>
+<th>A占用资源的时候，其它程序只能等待，只有A释放后，其它进程才能使用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>同时访问</td>
+<td>资源可以在一段时间内并发地被多个程序访问，不需要释放</td>
+</tr>
+</tbody></table>
+<ul>
+<li>虚拟性：把物理实体转变为若干个逻辑体，前者真实存在，后者是虚拟化的。而虚拟化的过程中涉及到两种虚拟技术，一种是时分复用技术，一种是空分复用技术：</li>
+</ul>
+<p>1.时分复用技术：即资源在时间上进行复用，不同的程序并发使用，多道程序分时使用计算机硬件资源，提高资源利用率。这里也涉及到<strong>两种技术：</strong></p>
+<table>
+<thead>
+<tr>
+<th>虚拟处理器技术</th>
+<th>借助多道程序设计为每个程序建立进程，多个程序分时复用处理器</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>虚拟设备技术</td>
+<td>就是把物理设备分为多个逻辑设备，每个程序占用一个逻辑设备，程序通过逻辑设备并发访问资源</td>
+</tr>
+</tbody></table>
+<p>2.空分复用技术：实现虚拟内存和虚拟磁盘：</p>
+<table>
+<thead>
+<tr>
+<th>虚拟内存</th>
+<th>逻辑上扩大程序的存储容量(其实比实际存储大)，来提高编程效率</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>虚拟磁盘</td>
+<td>就是我们平时见到的D盘，C盘等等，它本质上是一个物理磁盘，只不过分为多个虚拟磁盘而已，为了起到安全作用，D盘文件损坏不会影响到C盘数据</td>
+</tr>
+<tr>
+<td><strong>续上述几个概念</strong></td>
+<td></td>
+</tr>
+<tr>
+<td>- 异步性：多道程序设计的环境下，允许多个进程并发执行，而进程在使用资源的时候，不是一直执行下去，而是断断续续的，中途可能会等待，放弃。</td>
+<td></td>
+</tr>
+</tbody></table>
+<h1 id="操作系统之进程管理"><a href="#操作系统之进程管理" class="headerlink" title="操作系统之进程管理"></a>操作系统之进程管理</h1><h2 id="进程实体"><a href="#进程实体" class="headerlink" title="进程实体"></a>进程实体</h2><p>1.我们为什么需要进程？</p>
+<ul>
+<li><p>进程是我们的系统进行资源调度和分配的基本单位</p>
+</li>
+<li><p>进程可以隔离环境，资源，能够让程序独立运行，保证程序的正常运行</p>
+</li>
+<li><p>这也可以使资源利用率大大提升</p>
+</li>
+</ul>
+<h3 id="进程实体-1"><a href="#进程实体-1" class="headerlink" title="进程实体"></a>进程实体</h3><p>1.主存当中的进程状态：在主存当中，进程其实就是一段连续的存储空间，(至于为什么会连续的存储，那就涉及到<strong>局部性原理</strong>了，局部性原理博主已经在博客<strong>《吃透计算机组成原理》</strong>当中讲的比较清楚了，大家感兴趣可以去看看。)这一段存储空间也称为进程控制块。<br><strong>说到进程控制块，博主就展开叙述它的常用具体内容：</strong><br><img src="https://bkimg.cdn.bcebos.com/pic/500fd9f9d72a60596e71d6f82b34349b023bbaea?x-bce-process=image/watermark,g_7,image_d2F0ZXIvYmFpa2U4MA==,xp_5,yp_5" alt="进程控制块"></p>
+<ul>
+<li><p>标识符(Identifier)：就是相当于给进程去一个名字ID，让我们认识这是哪一个进程，并且标记是唯一的。</p>
+</li>
+<li><p>状态(State)：标记进程的状态，比如说是否在运行</p>
+</li>
+<li><p>程序计数器(Program Counter)：指向进程即将执行的下一条命令的地址，就是让进程的指令有序的进行。</p>
+</li>
+<li><p>内存指针(Memory Pointers)：指向程序代码和进程数据</p>
+</li>
+<li><p>上下文数据(Context Data)：就是存储进程执行时的处理器的数据</p>
+</li>
+<li><p>IO状态信息(IO Status Information):被进程IO状态信息占用的文件列表</p>
+</li>
+<li><p>记账信息(Accounting Information):记录使用处理器的实际，或者时钟的总数等等</p>
+</li>
+</ul>
+<p>以上便是进程控制块的具体常用内容，当然，还有其他的，就不一一叙述了，根据上面的内容我们可以大概分成四个部分：分别为进程标识符，处理器状态，进程调度信息，进程控制信息。</p>
+<p><strong>接下来咱们再谈谈进程控制块的其它概念：</strong></p>
+<p>2.进程控制块(PCB):<br>进程控制块是干什么的？</p>
+<ul>
+<li><p>其是描述和控制进程的通用数据结构，就是有效并且高效地存储进程信息的</p>
+</li>
+<li><p>它可以记录进程状态，并且控制进程的全部信息</p>
+</li>
+<li><p>PCB是操作系统在进行资源的调度的常家客，进程会被读取</p>
+</li>
+</ul>
+<p><strong>3.进程与线程：</strong><br>对进程和线程我们必须区分开来，<strong>进程包括很多线程，一个进程对应一个或者多个线程，可以说进程是线程的爸爸</strong>。一个进程好比一个程序，而线程就相当于这个程序当中的每个任务(界面展开，菜单选择，打开，关闭，执行等等)，那我们来了解一下进程与线程的关系：<br><img src="https://images2015.cnblogs.com/blog/1048430/201707/1048430-20170710140043259-1480436304.png" alt="进程与线程"></p>
+<ul>
+<li><p>线程是系统进行运行调度的最小单位，而进程是基本单位</p>
+</li>
+<li><p>线程是进程当中实际运行并且工作的单位，可以想象成进程为线程提供了庇护所和资源，让线程自己去工作。</p>
+</li>
+<li><p>一个进程可以并发执行多个线程，每个线程执行的任务不同</p>
+</li>
+<li><p>进程当中的线程共享进程资源</p>
+</li>
+</ul>
+<h2 id="五状态模型"><a href="#五状态模型" class="headerlink" title="五状态模型"></a>五状态模型</h2><p>进程总共分为五个状态，分别为创建状态，就绪状态，执行状态，阻塞状态和终止状态。博主就一一展开叙述了。<br>1.创建状态：进程被分配了PCB，即分配了进程控制块，但是其它资源并未准备就绪。</p>
+<p>2.就绪状态：其就是比创建状态多了点东西，就是其它资源已经都准备好了(比如说内存，堆栈空间等等)，此时只是缺少CPU的使用权，一旦获得便可执行。此时就绪状态的进程都插入到就绪队列当中了。</p>
+<p>3.执行状态：进程获得CPU使用权，使得程序执行。</p>
+<p>4.阻塞状态：因为某种原因进程放弃了CPU，而进入阻塞状态。比如说进程需要使用打印机，但是发出请求以后，打印机并未准备就绪，此时无法执行，进入阻塞状态。</p>
+<p>5.终止状态：进程执行完毕，此时系统会清理进程内存，并且归还PCB。</p>
+<p>五个状态之间的关系：<br><img src="https://img2018.cnblogs.com/blog/1542696/201907/1542696-20190730145010685-93845600.png" alt="五状态模型"></p>
+<h2 id="进程同步"><a href="#进程同步" class="headerlink" title="进程同步"></a>进程同步</h2><h3 id="两种模型"><a href="#两种模型" class="headerlink" title="两种模型"></a>两种模型</h3><p><strong>在了解进程同步之前，我们需要了解两种模型，来加深对进程同步的理解，以及了解为什么会要求进程同步：</strong><br>1.生产者-消费者模型：<br><img src="https://img-blog.csdnimg.cn/20190409124001598.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2x2eGluMTUzNTM3MTU3OTA=,size_16,color_FFFFFF,t_70" alt="生产者消费者模型"><br><strong>模型概述：</strong>生产者每生产一个进程便把进程都放入到仓库，即缓冲区里面，此时仓库进程数量加一，然后消费者需要执行某一个进程的时候，便会把对应的进程取出来，此时仓库里进程数量减一，其中缓冲区位于缓存Cache当中。</p>
+<p><strong>模型过程(特殊情况下)：</strong><br>假设register表示某个部分(生产者或者消费者)的进程的数量，count表示缓存当中进程的数量。<br>生产者过程：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">register &#x3D; count      &#x2F;&#x2F;1</span><br><span class="line">register &#x3D; register+1    &#x2F;&#x2F;2</span><br><span class="line">count&#x3D;register           &#x2F;&#x2F;3</span><br></pre></td></tr></table></figure>
+<p>消费者过程：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">register &#x3D; count        &#x2F;&#x2F;1</span><br><span class="line">register &#x3D; register-1   &#x2F;&#x2F;2</span><br><span class="line">count &#x3D; register       &#x2F;&#x2F;3</span><br></pre></td></tr></table></figure>
+<p>假设缓冲区里面有10个进程，此时若是生产者生产一个进程，消费者也消费一个进程，那么按理来说，最终缓存区的进程还是十个，是不是这也呢，我们来模拟一下。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">由于操作系统当中是并发性执行操作的，因此不一定是按照顺序来，有时候进程会断断续续，比如说生产操作的进程</span><br><span class="line">1.生产者执行生产者的第一步，register&#x3D;count此时，register生产&#x3D;10，count&#x3D;10</span><br><span class="line">2.生产者执行第二步，register&#x3D;register+1，此时register生产&#x3D;11，count&#x3D;10</span><br><span class="line">3.由于并发，此时可能是生产者断了，消费者开始执行第一步，register消费&#x3D;count，此时，register消费&#x3D;10，count&#x3D;10</span><br><span class="line">4.消费者执行第二步，register消费&#x3D;register消费-1，此时register消费&#x3D;9，count&#x3D;10</span><br><span class="line">5.消费者执行第三步，count&#x3D;register消费，此时register消费&#x3D;9，count&#x3D;10</span><br><span class="line">6.生产者又开始了，执行它的第三步，count&#x3D;register生产，此时count&#x3D;11，register生产&#x3D;11</span><br><span class="line">咦，奇怪了，我们按理来说这个缓冲区进程数量应该是10，为什么实际过程当中却变成了11呢，好，问题暂时留在这里。</span><br></pre></td></tr></table></figure>
+<p>2.哲学家进餐模型：<br>概述：有五个哲学家，他们在一张大圆桌上吃饭，总共有五个叉子，每个哲学家左右手各一个，规定当左右手都拿到叉子时，才能够进餐。<br><img src="https://img2018.cnblogs.com/blog/947879/201903/947879-20190327143737038-1696399331.jpg" alt="哲学家进餐"><br>两种情况：<br>理想情况下：<br>拿左边的叉子-&gt;右边没有叉子，等待-&gt;右边哲学家释放叉子-&gt;拿起右边叉子-&gt;进餐</p>
+<p>实际特殊情况下：<br>5个人同时拿起左边的叉子-&gt;都发现右边没有叉子-&gt;等待-&gt;一直没有叉子，都在等待-&gt;最终饿死</p>
+<p><strong>为什么会这样呢？他们之间没有进行通信，没有互相告诉对方我干了什么，好像有点道理，是会这样发生，为了解决这个问题以及上面的生产者-消费者模型，我们来学习进程同步吧。</strong></p>
+<h3 id="进程同步-1"><a href="#进程同步-1" class="headerlink" title="进程同步"></a>进程同步</h3><p>1.目的：</p>
+<ul>
+<li><p>在多进程进行资源竞争的时候，进行使用次序的协调</p>
+</li>
+<li><p>使并发执行的多个进程之间能够相互通信，有效的使用资源，有效地进行合作</p>
+</li>
+</ul>
+<p>2.进程同步的原则：</p>
+<ul>
+<li><p>空闲让进：资源没有被占用的时候，允许使用资源</p>
+</li>
+<li><p>忙则等待：资源被占用的时候，请求进程进行等待</p>
+</li>
+<li><p>有限等待：进程不会总是等待，而是会在有限的等待时间内能够使用被占用的资源，避免进程像哲学家问题一样等待僵死。</p>
+</li>
+<li><p>让权等待：等待的时候，进程需要让出CPU，进入阻塞状态</p>
+</li>
+</ul>
+<p>3.实现进程同步的方法：</p>
+<ul>
+<li><p>消息队列</p>
+</li>
+<li><p>共享存储</p>
+</li>
+<li><p>信号量</p>
+</li>
+</ul>
+<p><strong>具体大家可以网上查询资料，博主后面的实践环节也会进行相应的讲解。</strong></p>
+<p>4.线程同步：既然进程需要同步，那么作为进程的实际执行者线程也需要同步。</p>
+<p>5.线程同步的实现方法(博主后面会细讲)：</p>
+<ul>
+<li><p>互斥量：保证多线程互斥共享资源</p>
+</li>
+<li><p>读写锁：解决多读少写或者少读多写的情况</p>
+</li>
+<li><p>自旋锁</p>
+</li>
+<li><p>条件变量</p>
+</li>
+</ul>
+<h2 id="Linux的进程管理"><a href="#Linux的进程管理" class="headerlink" title="Linux的进程管理"></a>Linux的进程管理</h2><h3 id="Linux系统当中进程的相关概念"><a href="#Linux系统当中进程的相关概念" class="headerlink" title="Linux系统当中进程的相关概念"></a>Linux系统当中进程的相关概念</h3><p>1.进程类型：</p>
+<ul>
+<li><p>前台进程：具有终端并且能够和用户进行交互的进程，就是用户能够在终端上面看到进程的具体执行过程，并且这个进程会占用终端，而使得我们不能在终端中输入命令，除非退出进程</p>
+</li>
+<li><p>后台进程：不会占用终端，基本上不会和用户交互，优先级比前台进程低，而且具体执行过程在终端上面看不到，如果我们要去结束这个进程，将需要执行的命令以&amp;符号结束。</p>
+</li>
+<li><p>守护进程：属于特殊的后台进程，大部分是在系统启动的时候就已经运行了，直到系统关闭，一般进程名字以d字符结尾的都是后台进程，比如说crond进程。</p>
+</li>
+</ul>
+<p>2.进程的标记：</p>
+<ul>
+<li>进程ID：就和我们之前说过的标识符差不多，它是进程的唯一标识符，每个进程的ID都不一样，一般都是非负整数，至于ID最大值都由操作系统限定</li>
+</ul>
+<p><strong>扩展：</strong><br>父子进程：就是进程当中创建进程，前者为父进程，后者为子进程。Linux系统当中一般调用pstree命令查看</p>
+<p>特殊进程：ID为0的idle进程，是系统创建的第一个进程，以及ID为1的init进程，是idle的子进程，其完成了系统的初始化，可以说它是所有用户进程的祖先进程了。</p>
+<ul>
+<li>进程的状态标记(一般输入man ps命令获取)：每个进程的状态都对应一个标记字符，以下是常用的状态标记：</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>R</th>
+<th>表示进程为运行状态</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>S</td>
+<td>进程为睡眠状态</td>
+</tr>
+<tr>
+<td>D</td>
+<td>进程处于IO等待的睡眠状态</td>
+</tr>
+<tr>
+<td>T</td>
+<td>进程处于暂停状态</td>
+</tr>
+<tr>
+<td>Z</td>
+<td>进程处于退出状态</td>
+</tr>
+</tbody></table>
+<p>Linux命令：一般输入 ps -aux|grep 对应进程ID来获取对应进程的状态</p>
+<h3 id="Linux进程的相关操作命令"><a href="#Linux进程的相关操作命令" class="headerlink" title="Linux进程的相关操作命令"></a>Linux进程的相关操作命令</h3><p>1.ps命令：查看进程状态<br>比如说：<br>ps -aux可以查看进程详细信息<br>单独输入ps命令查看的是进程简略消息<br>ps -u 用户名：查看对应用户的所有详细进程<br>ps -aux|grep 进程ID：查看特定ID号进程的信息<br>ps -ef –forest:打印进程的父子状态<br>ps -aux –sort=-pcpu:根据CPU的使用频率来对进程进行排序<br>等等命令，<strong>至于Linux操作系统命令的相关应用，入门，实战，博主以后也会写博客，到时大家感兴趣可以看看</strong></p>
+<p>2.top命令：查看进程的使用内存，进程所有状态：虚拟内存，占用CPU，进程运行时间等等</p>
+<p>3.kill命令：发送信号指令给进程。<br>比如说：kill -9 62016:发送9信号给ID为62016的进程，其中9信号代表无条件停止，此时该进程会停止运行。</p>
+<h1 id="作业管理"><a href="#作业管理" class="headerlink" title="作业管理"></a>作业管理</h1><h2 id="进程调度"><a href="#进程调度" class="headerlink" title="进程调度"></a>进程调度</h2><p>1.概述：计算机会通过决策来决定哪个就绪进程可以获得CPU使用权，因而调度进程。</p>
+<p>2.调度步骤：</p>
+<ul>
+<li><p>收拾包裹：保留旧进程运行信息，请出该旧进程。</p>
+</li>
+<li><p>新进驻：选择新进程，准备运行环境并且分配CPU</p>
+</li>
+</ul>
+<p><strong>就是一个处理起当中新旧进程切换的过程。</strong></p>
+<p>3.调度机制：</p>
+<ul>
+<li><p>就绪队列排队机制：将就绪进程按一定的方式排成队列，以便于调度程序可以最快找到就绪进程</p>
+</li>
+<li><p>选择运行进程的委派机制：调度程序以一定的策略选择就绪进程，将CPU分配给它</p>
+</li>
+<li><p>新老进程上下文切换机制：保存当前进程的上下文信息，装入被委派执行进程的运行上下文，并且将旧进程的运行环境备份到主存当中(便于旧进程的下一次执行)，将新进程环境装入到CPU。</p>
+</li>
+</ul>
+<p>4.调度分类：</p>
+<ul>
+<li><p>非抢占式调度：调度程序不以任何原因抢占正在被使用的处理器，直到进程工作完成或因为IO阻塞才会让出处理器</p>
+</li>
+<li><p>抢占式调度：允许调度程序以一定的策略暂存当前进程并且保存旧进程上下文信息，分配处理器给新进程</p>
+</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>抢占式调度</th>
+<th>非抢占式调度</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>系统开销</td>
+<td>大</td>
+<td>小</td>
+</tr>
+<tr>
+<td>公平性</td>
+<td>相对公平</td>
+<td>不公平</td>
+</tr>
+<tr>
+<td>应用</td>
+<td>通用系统</td>
+<td>专用系统</td>
+</tr>
+</tbody></table>
+<p><strong>5.进程调度算法：</strong></p>
+<ul>
+<li><p>先来先服务调度算法：就绪队列越靠前就越容易调度</p>
+</li>
+<li><p>短进程优先调度算法：选择就绪队列当中运行时间最短的进程进行调度，但是这也不利于长进程的执行，因为这会使得长进程优先级很低</p>
+</li>
+<li><p>高优先权优先调度算法：进程附带优先权，优先调度权值高的进程，一般越紧迫的进程优先级越高</p>
+</li>
+<li><p>时间片轮转调度算法：在就绪队列当中按照先来先服务原则，从队首取出一个进程，分配一个时间片执行，在时间片内执行完可还行，但是若没有执行完，则阻塞，继续放入队尾，等待下一次执行，这种方式相对比较公平，但是不能保证及时的相应进程请求</p>
+</li>
+</ul>
+<h2 id="死锁"><a href="#死锁" class="headerlink" title="死锁"></a>死锁</h2><p>1.定义：两个或者两个以上的进程在执行过程中，由于竞争资源或者彼此通信而造成的一种阻塞现象，如果没有外力作用，那么都会无法推进，互相等待僵死，产生死锁状态。<br><img src="https://bkimg.cdn.bcebos.com/pic/810a19d8bc3eb1354547b744a51ea8d3fc1f4448?x-bce-process=image/watermark,g_7,image_d2F0ZXIvYmFpa2U4MA==,xp_5,yp_5" alt="死锁"><br>就好比T1和T2都在使用资源R1和R2，但是此时T1请求使用R2，T2请求使用R1，但是双方都在占用，不肯放弃，互相等待，因此就产生了死锁状态。</p>
+<p>2.死锁的产生：</p>
+<ul>
+<li><p>竞争资源：资源不够或者共享资源不满足各个进程的要求，因此资源相互竞争而产生死锁。就比如上面的示例图，如果多一个R1和R2，那么情况就不一样了，他们就可以直接使用，而不需要等待。</p>
+</li>
+<li><p>进程调度顺序不当：如果上面的例子是先T1使用R1，然后T1再使用R2，而T2再使用R1，此时T2没有占用资源，T1释放R1后T2占用，然后T1释放R2后T2占用，这种调度顺序就可以避免死锁，而当调度顺序为原来那种的时候，结果就不一样了，因此调度顺序很重要。</p>
+</li>
+</ul>
+<p>3.<strong>死锁的四个必要条件：</strong>只要是死锁，就必然会产生这四个条件。</p>
+<ul>
+<li><p>互斥条件：排他性资源，同时只能够由一个进程使用</p>
+</li>
+<li><p>请求保持条件：进程至少保持一个资源，并且还会提出新的资源请求，但是新的资源请求又被占用了，产生阻塞，但是这个被阻塞进程得不到别的资源就算了，自己的还是舍不得放弃</p>
+</li>
+<li><p>不可剥夺条件：获得的资源只能够由进程自己释放，不可以剥夺未使用完成的资源</p>
+</li>
+<li><p>环路等待条件：必然会形成进程-资源环形等待链</p>
+</li>
+</ul>
+<p>4.<strong>死锁的避免：</strong><br>既然要避免死锁，那么我们只需要破坏其中一个必要条件即可，但是第一个必要条件破坏不了，因为操作系统的资源本就由互斥共享资源。因此破坏后三者之一即可。<br><strong>预防方法：</strong></p>
+<ul>
+<li><p>破坏请求保持条件：规定进程运行之前一次性申请所有需要的资源，从而使其不再申请新资源</p>
+</li>
+<li><p>破坏不可剥夺条件：当一个进程请求新的资源得不到满足的时候，必须释放已有资源，</p>
+</li>
+<li><p>破坏环路等待条件：可用资源进行线性排序，申请资源的时候必须按照递增顺序或者递减顺序申请。</p>
+</li>
+</ul>
+<p><strong>当然，为了解决这种死锁，我们还有一种算法：</strong></p>
+<ul>
+<li>银行家算法：以银行贷款策略为基础：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">具体过程：</span><br><span class="line">1.客户申请的贷款有限，每次申请都必须声明最大贷款资金</span><br><span class="line"></span><br><span class="line">2.银行家如果能够满足贷款条件都应该拨款</span><br><span class="line"></span><br><span class="line">3.客户应该及时归还贷款</span><br><span class="line"></span><br><span class="line">在进行资源调度的时候，这几个对应过程需要用到三个表，分别为所需资源表(客户需要的资源量)，已分配资源表(每个客户已经被分配得到的资源)和可分配资源表(目前还可以分配的资源)</span><br><span class="line">求得每个表以后，所需资源表减去已分配资源表得到新表，之后和可分配资源表进行一一比对，如果能够继续满足所有条件并且分配，则进行资源分配，等待这个进程完成以后释放这些资源，更新表，然后依次按照上述进行分配，直到分配完为止。</span><br></pre></td></tr></table></figure>
+<p>上面的算法破坏了死锁的几个必要条件从而避免了死锁，<strong>比如说声明最大贷款量就是破坏了请求保持条件，分配以后及时归还破坏了不可剥夺条件</strong>，以此来达到避免死锁的效果。</p>
+<h1 id="存储管理"><a href="#存储管理" class="headerlink" title="存储管理"></a>存储管理</h1><h2 id="内存分配与回收"><a href="#内存分配与回收" class="headerlink" title="内存分配与回收"></a>内存分配与回收</h2><p>1.为什么要进行内存分配和回收？(之后博主会相应的写一篇GC回收机制的博客)</p>
+<ul>
+<li><p>确保计算机有足够的内存进行使用(回收)</p>
+</li>
+<li><p>确保程序可以从可用内存中获取一部分内存(分配)</p>
+</li>
+<li><p>确保能够归还使用后的内存</p>
+</li>
+</ul>
+<h3 id="内存分配"><a href="#内存分配" class="headerlink" title="内存分配"></a>内存分配</h3><p>1.单一连续分配：只能够在单用户，单进程的操作系统当中使用(其中内存分为系统区和用户区用户进程在用户区里面连续分配，系统进程在系统区里面连续分配)</p>
+<p>2.固定分区分配：支持多道程序设计，内存会被划分为若干个固定大小的区域，每个分区只能够供一个进程使用，互不干扰。</p>
+<p><strong>3.动态分区分配(这个就比较灵活了，也比较常用)：</strong><br><strong>涉及的数据结构:</strong></p>
+<ul>
+<li><p><strong>动态分区空闲表</strong>，这个表存储着各分区的标号以及标记，标号是各个分区的ID，标记(0和1)代表着是否被使用，0则未使用，1则以及被占用</p>
+</li>
+<li><p>动态分区空闲链表：每一个空闲区链表节点都记录着可存容量，其中连续的空闲区可以合并为一个链表节点。</p>
+</li>
+</ul>
+<p><strong>动态分区分配算法：</strong></p>
+<ul>
+<li>首次适应算法(FF算法)：这个需要使用到空闲链表，在分配内存的时候，遍历空闲链表，但是每次遍历都需要从头部开始，如果说在遍历完毕的时候，还没有找到适当的空闲区，则分配失败，反之则分配成功。<strong>但是这种算法会使得头部的很多空闲区地址被不断划分，到时其越来越小，从头到尾遍历的时候，前面的基本不符合要求，但是仍然从头开始，会十分麻烦，效率低下</strong></li>
+</ul>
+<p><strong>因此后面得到了改进：</strong></p>
+<ul>
+<li><p>循环适应算法：从上次检索完的位置开始遍历，这个就弥补了首次适应算法的缺点。</p>
+</li>
+<li><p>最佳适应算法：把空闲链表按照容量大小排序，一般是从小到大，遍历分配的时候会找到最佳空闲区，因为此时空闲区基本可以恰好满足进程空间，而不会造成大量空间浪费</p>
+</li>
+<li><p>快速适应算法：这个要求有多个空闲链表，每个链表存储相同容量大小的节点，找的时候就从容量小的链表开始找，如果不满足，则从下一条链表找，直到找到合适的为止</p>
+</li>
+</ul>
+<h3 id="内存回收"><a href="#内存回收" class="headerlink" title="内存回收"></a>内存回收</h3><p>内存回收总共有四种情况：</p>
+<ul>
+<li><p>回收区和空闲区连续并且回收区位于后面的时候：只需要把空闲区的容量扩大为(原来空闲区+回收区)的容量即可。</p>
+</li>
+<li><p>当回收区为与空闲区之前并且二者连续时：不仅需要扩大空闲区容量(原来空闲区大小+回收区)，还需要把空闲区地址改为回收区的</p>
+</li>
+<li><p>当回收区为两个空闲区之间并且三者连续的时候，扩大空闲区容量，地址改为前面一个空闲区的地址</p>
+</li>
+<li><p>当为单独的回收区的时候：创建新的空闲区节点，存入到空闲区链表中</p>
+</li>
+</ul>
+<h2 id="段页式存储管理"><a href="#段页式存储管理" class="headerlink" title="段页式存储管理"></a>段页式存储管理</h2><h3 id="页式存储管理"><a href="#页式存储管理" class="headerlink" title="页式存储管理"></a>页式存储管理</h3><p>1.特点：</p>
+<ul>
+<li><p>其将进程逻辑空间<strong>等分</strong>为若干大小的页面(页面就相当于我们之前听过的字块，只不过前者为逻辑层面，后者为物理层面)</p>
+</li>
+<li><p>相应的把物理内存空间分成页面大小一样的物理块，即字块。</p>
+</li>
+<li><p>以页面为单位把进程空间存储在物理内存当中分散的物理块。</p>
+</li>
+</ul>
+<p><strong>注意！！！页面大小的选取必须适当，如果过大则难以分配，如果过小则会造成内存碎片过多(空闲区大于页面的时候，空闲区空间过剩，形成碎片)</strong></p>
+<p>2.页表：逻辑空间与物理空间的映射。<br><img src="https://bkimg.cdn.bcebos.com/pic/377adab44aed2e7341d4f11e8301a18b87d6fac7?x-bce-process=image/watermark,g_7,image_d2F0ZXIvYmFpa2U4MA==,xp_5,yp_5" alt="页表"><br>页号代表其进程空间在逻辑上的存储，块号代表进程空间在对应物理空间上的存储</p>
+<p>3.地址表示：<br>一般时页号+页内偏移，其实可以类比于字块+字的地址</p>
+<p>4.多级页表：也就是说页表中还有页表，其存有页表的地址，当访问的时候，才会开辟对应的空间，这个也是为了避免页表太多而占用大量内存。</p>
+<p><strong>5.该存储方式的缺点：</strong>如果说把一段连续的逻辑分布在多个页面当中，就会大大降低存储效率，因为页面的存储是分散的。</p>
+<h3 id="段式存储管理"><a href="#段式存储管理" class="headerlink" title="段式存储管理"></a>段式存储管理</h3><p>1.特点：这个恰好与页式存储相反，它不是等分，而是按照进程逻辑进行空间分段，哪个逻辑占用空间大，其分配的段空间就大，并且段的长度是有连续的逻辑长度决定。</p>
+<p>2.段表：<br><img src="https://bkimg.cdn.bcebos.com/pic/bd315c6034a85edf487f056d43540923dc547589?x-bce-process=image/watermark,g_7,image_d2F0ZXIvYmFpa2U4MA==,xp_5,yp_5" alt="段表"><br>其中，段号就是指对应的段区域的ID，基址就是段的起始内存地址，段长就是指段的空间大小。</p>
+<p>3.地址表示：和页式存储类比，段号+段内偏移</p>
+<p>4.对比：</p>
+<table>
+<thead>
+<tr>
+<th>同</th>
+<th>异</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>都是离散的管理了进程逻辑空间</td>
+<td>页的分配是等分的，而段则是按照逻辑进行空间分配</td>
+</tr>
+<tr>
+<td></td>
+<td>分页是为了合理利用空间，而分段是为了满足用户需求</td>
+</tr>
+<tr>
+<td></td>
+<td>页的大小固定，但是段的大小可以变化</td>
+</tr>
+<tr>
+<td></td>
+<td>页表的信息是一维的，而段表是二维的</td>
+</tr>
+</tbody></table>
+<h3 id="段页式存储管理-1"><a href="#段页式存储管理-1" class="headerlink" title="段页式存储管理"></a>段页式存储管理</h3><p>其就是段式存储和页式存储相互协调进行存储，特点：</p>
+<ul>
+<li><p>逻辑空间分段</p>
+</li>
+<li><p>段内空间分页</p>
+</li>
+<li><p>地址为：段号+段内页号+页内地址</p>
+</li>
+</ul>
+<h2 id="虚拟内存"><a href="#虚拟内存" class="headerlink" title="虚拟内存"></a>虚拟内存</h2><p>1.概述：<br><strong>为什么要使用虚拟内存？</strong>这个问题前面将操作系统的虚拟性的时候也提到过，我们细细谈来：</p>
+<ul>
+<li><p>有些进程的实际内存需求很大，但是现实不允许，它的物理内存却比这个小</p>
+</li>
+<li><p>多道程序设计使得每个进程能够用的物理空间更加稀缺(每个进程都占空间，而多道程序一起运行就更加了)</p>
+</li>
+<li><p>物理内存总是有不够的时候，我们不可能无限的增加，因此需要使用虚拟内存</p>
+</li>
+</ul>
+<p><strong>如何使用虚拟内存？？</strong><br>把程序的使用内存划分(按照上面所说的段页式管理方法)，在这个程序运行的时候，肯定有些内存是暂时不需要的，有些内存是当前运行需要使用的，这个时候，就会将部分暂不使用的内存放入辅存，腾出更多内存给其它进程。<br><img src="/2020/02/19/caozuoxitong/1.png" alt="虚拟内存"><br>红色代表的是需要使用的，灰色代表暂不需使用，对于暂不使用的，系统把被其需要使用的存储空间地址转移到辅存，即磁盘当中，当需要的时候，就会访问磁盘当中的地址，然后在对应的内存当中开辟对应地址的空间即可。</p>
+<p>2.程序的局部性原理：</p>
+<ul>
+<li><p>程序运行的时候，无需全部装入内存，只需要装入当前需要使用的部分即可</p>
+</li>
+<li><p>如果说访问页不在内存当中，则会发出缺页中断信号，此时会进程页面置换，即从辅存中置换空间到内存当中</p>
+</li>
+<li><p>所以说程序才会看起来有很多使用空间，因为有虚拟内存的存在</p>
+</li>
+</ul>
+<p><strong>3.虚拟内存置换算法：</strong><br>这个算法在博主之前在<a href="https://liujunchi-bot.github.io/2020/01/03/Computer/#more">吃透计算机组成原理</a>中写的缓存置换算法当中已经提到了，博主就不再多提了，这个可以类比缓存置换算法，把之前的缓存-主存置换看成辅存-主存置换即可。</p>
+<h2 id="Linux的存储管理"><a href="#Linux的存储管理" class="headerlink" title="Linux的存储管理"></a>Linux的存储管理</h2><h3 id="Buddy内存管理算法"><a href="#Buddy内存管理算法" class="headerlink" title="Buddy内存管理算法"></a>Buddy内存管理算法</h3><p>1.概述：Buddy内存管理算法主要是用来解决内存外碎片的。以下是具体解释：</p>
+<ul>
+<li><p>内存外碎片：当内存过小，无法进行分配的时候，就会留下一整块空闲区，即内存外碎片</p>
+</li>
+<li><p>内存内碎片：当内存大于页面请求空间的时候，剩余的空间不能被利用，就产生了内存内碎片</p>
+</li>
+<li><p>目的：努力让内存分配和相邻的内存段进行合并的过程能够快速进行</p>
+</li>
+</ul>
+<p><strong>2.原则：</strong></p>
+<ul>
+<li>在请求内存或者分配内存的时候，尽量从小到大，并且每一个请求大小最好向上取整为2的幂次方的大小，比如说进程请求了70K的空间，此时不是2的幂次方，因此需要向上取整，而70K上面的并且能够为2的幂次方的最小数值为128，因此会分配128K的内存给它。</li>
+</ul>
+<p><strong>3.伙伴系统：</strong>一片连续内存的“伙伴”是相邻的另外一片大小一样的连续内存。</p>
+<p><strong>4.过程：</strong>假设存储空间为1MB，而且需要分配100K的内存</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">内存分配过程：</span><br><span class="line">查询过程：</span><br><span class="line">1.100K不是2的幂次方，请求空间向上取整为128K</span><br><span class="line"></span><br><span class="line">2.查询是否有128K的空闲内存块，发现没有</span><br><span class="line"></span><br><span class="line">3.向上取整为256K，查询是否有256K的空闲内存块，发现没有</span><br><span class="line"></span><br><span class="line">4.向上取整为512K，查询是否有512K的空闲内存块，发现没有</span><br><span class="line"></span><br><span class="line">5.向上取整为1024K(1M&#x3D;1024K)，查询是否有1024K的空闲内存块，发现刚刚好有</span><br><span class="line"></span><br><span class="line">分配过程：</span><br><span class="line">1.把1M内存分配出去</span><br><span class="line"></span><br><span class="line">2.发现1M内存大了，向下取整拆分成两个512K两个内存块，留下一个空闲块节点放入到512K的空闲链表中(此空闲链表存储的每个节点容量大小都为512K)，其余分配出去</span><br><span class="line"></span><br><span class="line">3.发现512K也大了，512K的内存卡拆分为两个256K的内存卡，发现256K可以分配，分配一个出去，另外一个256K的空闲块节点存入到256K容量的空闲链表中(同上)</span><br><span class="line"></span><br><span class="line">4.发现256K不满足最小需求，继续拆分为两个128K的内存块，一个存入到128K空闲链表当中，另外一个分配出去，发现128K满足最小需求，因此分配出去，分配过程完毕！</span><br></pre></td></tr></table></figure>
+<p><strong>分配完以后，进程使用完内存后会进行回收：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">回收过程：</span><br><span class="line">1.判断分配出去的128K内存在空闲链表当中是否有&quot;伙伴&quot;，发现有一个容量为128K的空闲块节点，移除该伙伴，并且合并两个内存块</span><br><span class="line"></span><br><span class="line">2.合并之后的256K大小的内存块，继续找自己的“伙伴”，发现有，移除伙伴并合并为大小为512K的内存块</span><br><span class="line"></span><br><span class="line">3.继续找“伙伴”，发现有，则合并为1024K，即1M的内存</span><br><span class="line"></span><br><span class="line">4.继续找“伙伴”，发现没有，回收完毕，把该内存插入到1M的空闲链表当中</span><br></pre></td></tr></table></figure>
+<p><strong>这个算法解决了内存外碎片的问题，尽量的让分配的内存满足请求空间的最小要求，但是很多时候会造成分配的空间大于实际需求空间的情况，会产生内存内碎片。</strong></p>
+<h3 id="Linux交换空间"><a href="#Linux交换空间" class="headerlink" title="Linux交换空间"></a>Linux交换空间</h3><p>1.概述：Linux交换空间实际上是磁盘的一个分区，当Linux物理内存使用爆满的时候，会把一些内存交换到Swap空间，以腾出更多的内存。这个swap空间是初始化系统的时候就已经配置好的。</p>
+<p><strong>2.用途：</strong></p>
+<ul>
+<li><p>冷启动内存依赖：一些大的程序在启动的时候，会需要大量的内存，但是有些内存在后面运行的时候，很多都很少使用，因此可以将这些内存放入到swap空间，释放更多的物理内存</p>
+</li>
+<li><p>系统睡眠依赖：当Linux系统需要睡眠的时候，把系统所有数据放入到Swap空间，便于下次启动</p>
+</li>
+<li><p>大进程空间依赖：有些进程内存的消耗很大，需要把其它进程内存放入到swap空间当中，以腾出更多的内存供其使用<br>由于交换空间是磁盘，速度会比较慢。</p>
+</li>
+</ul>
+<p><strong>当然，对于这个交换空间，我们需要和虚拟内存区别开来</strong></p>
+<table>
+<thead>
+<tr>
+<th>同</th>
+<th>都存在于磁盘当中，并且都是与主存进行置换</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>异</td>
+<td>交换空间是相对于操作系统而言，解决的是系统空间不足的问题，而虚拟内存是相当于进程而言，解决的是进程物理内存不足的情况</td>
+</tr>
+</tbody></table>
+<h1 id="文件管理"><a href="#文件管理" class="headerlink" title="文件管理"></a>文件管理</h1><h2 id="操作系统的文件管理"><a href="#操作系统的文件管理" class="headerlink" title="操作系统的文件管理"></a>操作系统的文件管理</h2><h3 id="文件的逻辑结构"><a href="#文件的逻辑结构" class="headerlink" title="文件的逻辑结构"></a>文件的逻辑结构</h3><p>1.文件类型：</p>
+<table>
+<thead>
+<tr>
+<th>有结构文件</th>
+<th>文件内容由定长记录(存储文件格式，文件描述等结构化数据) 和可变长记录组成(文件的具体内容)组成</th>
+<th>文本文件，文档，媒体文件</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>无结构文件</td>
+<td>属于流式文件，内容长度以字节为单位，比如说exe,dl,so文件</td>
+<td>二进制文件，链接库</td>
+</tr>
+</tbody></table>
+<p>2.顺序文件：顾名思义，就是按照顺序存放在存储介质中的文件，比如说磁带文件这种顺序性比较简单，使得存储效率很高，但是和我们所说的数组一样，不方便进行增删减改文件。<br>因此，针对这个缺点做出了改进：</p>
+<p><strong>3.索引文件：</strong>为了解决可变长文件的存储(增删减改)，这个需要使用到索引表完成存储。<br><img src="https://iknow-pic.cdn.bcebos.com/94cad1c8a786c917df946b44c63d70cf3bc75733?x-bce-process=image/resize,m_lfit,w_600,h_800,limit_1" alt="索引表"><br>索引表当中由键值(key)和逻辑地址(pointer)组成，键值可能就是文件建立的日期，而逻辑地址指向这个日期内建立的文件列表，增删减改只需要在对应键值当中修改地址，或者文件列表当中进行操作即可。</p>
+<h3 id="辅存存储空间的分配"><a href="#辅存存储空间的分配" class="headerlink" title="辅存存储空间的分配"></a>辅存存储空间的分配</h3><p><strong>1.辅存的分配方式：</strong>分别有连续分配，链接分配(分为隐式链接和显式链接分配)以及索引分配：</p>
+<ul>
+<li><p>连续分配：按内存块的顺序进行分配，读取文件的速度快，但是对于存储文件的要求高，必须得要求其容量满足连续的存储空间，要刚刚好。</p>
+</li>
+<li><p>链接分配：连续分配的改进版，能够将文件离散地存储，需要额外的存储空间来存储文件盘块链接顺序，即告诉我们它存在哪。</p>
+</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>隐式分配</th>
+<th>隐式分配的下一个链接指向存储在当前盘块内，文件存储在盘块1，4当中，那么1这存储了指向4盘块的链接，这样子十分适合顺序访问，但是不利于随机访问，如果访问中间某个盘块，还需要从头一个个链接来访问，而且只要任何一个链接出问题了，影响都是整体的，可靠性差</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>显式分配</td>
+<td>会使用到FAT表，FAT表存储了每个盘块的标号和其对应的下一个盘块，这支持随机访问，查表一下子就找到了，但是不支持高效的直接存储，因为FAT表占空间比较大</td>
+</tr>
+</tbody></table>
+<ul>
+<li>索引分配：把所有的文件的索引集中存储，每一个文件会离散地存储在多个盘块中，而且每个文件都有一个索引块来记录所有盘块的信息，在这个盘块中可以根据索引直接访问每一个盘块，如果说我们需要读取某个文件的时候，直接读取文件索引就可以了。<br><img src="https://img-blog.csdn.net/20180804170952531?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTE1ODcwNzA=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70" alt="索引分配"><br>比如说第十九个盘块存储了其它盘块的位置信息，通过19盘块可以找到索引其它盘块。</li>
+</ul>
+<p>2.存储空间管理：分为空闲表，空闲链表，位示图。</p>
+<ul>
+<li><p>空闲表：里面有每一行的序号，每一行存储着第一个空闲盘块号和盘块数，比如说空闲盘块有1，2，3，4这几个连续的，那么这个存储信息就是第一个空闲盘块号为1，空闲盘块数位4.<br><img src="/2020/02/19/caozuoxitong/2.png" alt="空闲表"></p>
+</li>
+<li><p>空闲链表：类比空闲表，每一个节点存储第一个空闲盘块号和盘块数，存储在链表当中</p>
+</li>
+<li><p>位示图：位示图里面的信息有，每一行都代表这一个磁道，每一行里面存储着磁道号，以及磁道当中的盘块占用状态。<br><img src="https://bkimg.cdn.bcebos.com/pic/0e2442a7d933c895985c3f0ade1373f0820200a4?x-bce-process=image/watermark,g_7,image_d2F0ZXIvYmFpa2U4MA==,xp_5,yp_5" alt="位示图"><br>如上图，第一行存储盘块号，第一列存储磁道号，中间存储是否被占用的信息，1代表该盘块已经被占用，0代表空闲盘块。位示图比较好用，维护成本低，占用空间也小，而且还比较容易区找到空闲块。</p>
+</li>
+</ul>
+<h3 id="目录管理"><a href="#目录管理" class="headerlink" title="目录管理"></a>目录管理</h3><p>目录管理一般都会使用目录树：<br><img src="/2020/02/19/caozuoxitong/3.png" alt="目录树"></p>
+<h2 id="Linux文件的基本操作"><a href="#Linux文件的基本操作" class="headerlink" title="Linux文件的基本操作"></a>Linux文件的基本操作</h2><p>1.Linux目录：以下是Linux系统常用的目录：<br><img src="/2020/02/19/caozuoxitong/4.png" alt="Linux"><br>这里面也涉及到相对路径和绝对路径：</p>
+<ul>
+<li><p>相对路径：相对于当前操作目录的路径</p>
+</li>
+<li><p>绝对路径：从根目录开始</p>
+</li>
+</ul>
+<p><strong>2.Linux文件常用操作：</strong></p>
+<ul>
+<li><p>touch+文件名：创建文件(记得空格)</p>
+</li>
+<li><p>vim+文件名：创建并且修改文件</p>
+</li>
+<li><p>cat+文件名：读取查看文件</p>
+</li>
+<li><p>rm 文件名：删除文件(可看出remove)</p>
+</li>
+<li><p>mkdir+文件夹名：创建文件夹</p>
+</li>
+<li><p>rm -r 文件夹名：删除文件夹</p>
+</li>
+</ul>
+<p>3.文件类型：<br>一般输入 ls -al查看</p>
+<table>
+<thead>
+<tr>
+<th>套接字</th>
+<th>一般前面标记位s</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>普通文件</td>
+<td>前面标记位-</td>
+</tr>
+<tr>
+<td>目录文件</td>
+<td>前面标记为d</td>
+</tr>
+<tr>
+<td>符号链接</td>
+<td>前面标记为l</td>
+</tr>
+<tr>
+<td>设备文件</td>
+<td>前面标记位 c或者b</td>
+</tr>
+<tr>
+<td>FIFO文件</td>
+<td>前面标记为p</td>
+</tr>
+</tbody></table>
+<h2 id="Linux文件系统"><a href="#Linux文件系统" class="headerlink" title="Linux文件系统"></a>Linux文件系统</h2><p>1.概览：</p>
+<table>
+<thead>
+<tr>
+<th>FAT文件系统</th>
+<th>早期windows系统使用，使用一张FAT表存储文件盘块信息</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>NTFS文件系统</td>
+<td>WindowsNT环境的文件系统，对FAT做出改进，取代</td>
+</tr>
+<tr>
+<td>EXT文件系统</td>
+<td>扩展文件系统。Linux系统使用，但是这个不能被Windows系统识别</td>
+</tr>
+</tbody></table>
+<p>2.EXT文件系统：<br>1.组成：其由一个Boot Sector和多个Block Group组成。</p>
+<ul>
+<li><p>Boot Sector：启动扇区，安装开机管理程序</p>
+</li>
+<li><p>Block Group：块组，用来存储文件系统的数据</p>
+</li>
+</ul>
+<p><img src="/2020/02/19/caozuoxitong/5.png" alt="EXT"></p>
+<p>2.Block Group介绍：</p>
+<p><img src="/2020/02/19/caozuoxitong/6.png" alt="Block Group"></p>
+<ul>
+<li><p>Inode Table:存放文件Inode，每一个文件都有一个Inode，即文件的索引节点，这里面存放着文件信息(有文件类型，权限，物理地址，文件长度，文件存取时间等)，但是呢，文件的名字是存放在该文件的目录的Inode节点上面，而不是文件的Inode里面，这个也是为了方便，在列出目录文件的时候无需加载每个文件的Inode，效率非常高。</p>
+</li>
+<li><p>Inode bitmap：Inode的位示图，记录已分配的Inode和未分配的Inode</p>
+</li>
+<li><p>Data block：存放文件内容，每一个block都有唯一的编号，文件的block记录在文件的Inode中</p>
+</li>
+<li><p>Block bitmap：与Inode bitmap相似，用来记录Data block的使用情况</p>
+</li>
+<li><p>Superblock：记录整个文件系统的相关信息，比如说Block和Inode的使用情况，文件系统的时间信息，控制信息等等。</p>
+</li>
+</ul>
+<h1 id="设备管理"><a href="#设备管理" class="headerlink" title="设备管理"></a>设备管理</h1><h2 id="IO设备"><a href="#IO设备" class="headerlink" title="IO设备"></a>IO设备</h2><p>1.概述：对于CPU来说，凡是对CPU进行数据输入或者输出的设备都是输入设备或者输出设备，这是广义的IO设备。</p>
+<h2 id="分类"><a href="#分类" class="headerlink" title="分类"></a>分类</h2><ul>
+<li>按照使用的特性来分：</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>存储设备</th>
+<th>U盘，内存，磁盘</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>交互IO设备</td>
+<td>键盘，显示器，鼠标</td>
+</tr>
+</tbody></table>
+<ul>
+<li>按照信息交换来分类：</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>块设备</th>
+<th>磁盘，SD卡</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>字符设备</td>
+<td>打印机，shell终端</td>
+</tr>
+</tbody></table>
+<ul>
+<li><p>按设备共享属性：分为独占设备，共享设备，虚拟设备</p>
+</li>
+<li><p>按照传输速率：分为低速设备，中速设备和高速设备</p>
+</li>
+</ul>
+<h2 id="IO设备缓冲区"><a href="#IO设备缓冲区" class="headerlink" title="IO设备缓冲区"></a>IO设备缓冲区</h2><p>1.目的：IO设备缓冲区的存在是为了解决CPU与IO设备速度不匹配的问题</p>
+<p><strong>2.说明：</strong></p>
+<ul>
+<li><p>其可以减少CPU处理IO请求的频率</p>
+</li>
+<li><p>可以提高CPU与IO设备之间的并行性</p>
+</li>
+</ul>
+<p><strong>就比如说，有多个程序区请求IO设备，此时需要通过多个进程来请求，这个时候信息交换次数会比较多，因此把所有程序需要请求的IO设备的信息都放入IO设备缓冲区，这也IO设备取的时候只需要一次信息交换就欧克了，效率高。</strong></p>
+<h2 id="SPOOLING技术"><a href="#SPOOLING技术" class="headerlink" title="SPOOLING技术"></a>SPOOLING技术</h2><p>1.概述：SPOOLing技术适用于慢速字符设备和计算机的交互</p>
+<p>2.原理：</p>
+<ul>
+<li><p>利用高速共享设备将低速独享设备模拟为高速共享设备</p>
+</li>
+<li><p>把同步调用改为异步调用<br><img src="https://bkimg.cdn.bcebos.com/pic/b999a9014c086e06eab92e6406087bf40ad1cb88?x-bce-process=image/watermark,g_7,image_d2F0ZXIvYmFpa2U4MA==,xp_5,yp_5" alt="SPOOLING"><br>SPOOLING技术会把所有进程的输入数据和输出数据分别放入到输入井和输出井当中。</p>
+</li>
+</ul>
+<p><strong>3.过程：</strong></p>
+<ul>
+<li><p>在输入和输出之间增加了排队转储环节(即加入输入井和输出井)</p>
+</li>
+<li><p>SPOOLing技术负责输入输出井与低速设备之间的调度</p>
+</li>
+<li><p>进程直接与高速设备交互，减少等待时间。</p>
+</li>
+</ul>
+<h1 id="拓展"><a href="#拓展" class="headerlink" title="拓展"></a>拓展</h1><p>##线程同步<br>###线程同步之互斥量<br>1.原子性：一系列操作不可以被终断，要么全部执行完，要么就不执行</p>
+<p>2.互斥量：处于两种状态之一的变量：解锁和加锁，这可以保证资源访问的串行</p>
+<p>3.使用：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">C语言：</span><br><span class="line">声明互斥量：pthread_mutex_t mutex&#x3D;PTHREAD_MUTEX_INITIAL；</span><br><span class="line"></span><br><span class="line">加锁：pthread_mutex_lock(&amp;mutex); &#x2F;&#x2F;保证资源的互斥性，期间不准其它线程占用</span><br><span class="line"></span><br><span class="line">解锁：pthread_mutex_unlock(&amp;mutex)  &#x2F;&#x2F;释放锁，资源可以被其它线程使用</span><br><span class="line"></span><br><span class="line">python语言：</span><br><span class="line">声明一个互斥锁：lock &#x3D; threading.Lock() #导入threading包即可(import threading)</span><br><span class="line"></span><br><span class="line">加锁：lock.acquire()</span><br><span class="line"></span><br><span class="line">解锁：lock.release()</span><br></pre></td></tr></table></figure>
+<p>比如说，我们在生产者-消费者模型中，都加一个锁，完成他们的任务之后再解锁，就可以保证正常运行，免受并发的影响。</p>
+<h3 id="线程同步之自旋锁"><a href="#线程同步之自旋锁" class="headerlink" title="线程同步之自旋锁"></a>线程同步之自旋锁</h3><p>其原理和互斥锁一样<br>1.概述：</p>
+<ul>
+<li><p>其是多线程同步的变量</p>
+</li>
+<li><p>使用自旋锁会反复检查锁变量是否可用</p>
+</li>
+<li><p>其不会让出CPU，而是一种忙等待的状态，除非解锁</p>
+</li>
+</ul>
+<p>2.作用：</p>
+<ul>
+<li>避免了新老进程切换的开销</li>
+</ul>
+<p>3.使用：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">以C语言为例：</span><br><span class="line">定义一个自旋锁：pthread_spinlock_t spin_lock;</span><br><span class="line"></span><br><span class="line">加锁：pthread_spin_lock(&amp;spin_lock);</span><br><span class="line"></span><br><span class="line">解锁：pthread_spin_unlock(&amp;spin_lock);</span><br><span class="line"></span><br><span class="line">使用前可以初始化：pthread_spin_init(&amp;spin_lock);</span><br></pre></td></tr></table></figure>
+
+<h3 id="线程同步之条件变量"><a href="#线程同步之条件变量" class="headerlink" title="线程同步之条件变量"></a>线程同步之条件变量</h3><p>1.概述：</p>
+<ul>
+<li><p>允许线程睡眠，直到满足所需条件</p>
+</li>
+<li><p>满足条件的时候，会发出信号唤醒线程</p>
+</li>
+</ul>
+<p>2.生产者-消费者模型为例：</p>
+<ul>
+<li><p>缓冲区进程数量小于等于0的时候，消费者不允许消费</p>
+</li>
+<li><p>缓冲区满的时候，生产者不允许生产</p>
+</li>
+<li><p>生产者每生产一次，就发信号唤醒可能等待的进程(消费者)</p>
+</li>
+</ul>
+<p>3.使用(一般和互斥锁一起使用)：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">以C语言为例：</span><br><span class="line">定义互斥锁： pthread_mutex_t mutex;</span><br><span class="line">加锁</span><br><span class="line">定义条件变量：pthread_cond_t &#x3D; cond;</span><br><span class="line"></span><br><span class="line">睡眠：pthread_cond_wait(&amp;cond,&amp;mutex);</span><br><span class="line"></span><br><span class="line">唤醒发通知：pthread_cond_signal(&amp;cond)</span><br><span class="line"></span><br><span class="line">通知完就解锁</span><br></pre></td></tr></table></figure>
+<h3 id="使用fork函数系统调用创建进程"><a href="#使用fork函数系统调用创建进程" class="headerlink" title="使用fork函数系统调用创建进程"></a>使用fork函数系统调用创建进程</h3><p>1.概述：</p>
+<ul>
+<li><p>fork创建进程初始化状态，此时该进程相当于子进程，调用这个函数的相当于父进程</p>
+</li>
+<li><p>fork创建完进程就分配资源</p>
+</li>
+</ul>
+<p>2.函数说明：</p>
+<ul>
+<li><p>该函数没有参数，直接调用即可</p>
+</li>
+<li><p>调用以后会返回子进程id和0，前者是父进程返回的，后者子进程返回</p>
+</li>
+</ul>
+<h2 id="进程同步-2"><a href="#进程同步-2" class="headerlink" title="进程同步"></a>进程同步</h2><h3 id="进程同步之共享内存"><a href="#进程同步之共享内存" class="headerlink" title="进程同步之共享内存"></a>进程同步之共享内存</h3><p>1.概述：</p>
+<ul>
+<li><p>多进程共享物理内存</p>
+</li>
+<li><p>逻辑内存空间是独立的</p>
+</li>
+<li><p>允许不相关的进程访问同一片物理内存，而这一片内存可以通过页表映射到不同的进程</p>
+</li>
+<li><p>共享内存是两个进程之间进行共享和传递数据最快的方式</p>
+</li>
+<li><p>共享内存不会提供同步机制，需要通过外力或者其它机制进行管理</p>
+</li>
+</ul>
+<p>2.步骤：</p>
+<ul>
+<li><p>申请共享内存</p>
+</li>
+<li><p>连接到进程空间</p>
+</li>
+<li><p>使用共享内存</p>
+</li>
+<li><p>脱离进程空间并且删除</p>
+</li>
+</ul>
+<p>3.使用举例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">假设客户端需要和服务端使用共享内存进行通信</span><br><span class="line">那么我们需要一个共享内存的数据结构(外力机制)</span><br><span class="line">定义一个共享内存的结构体：</span><br><span class="line">struct shareEntry&#123;</span><br><span class="line">bool can_read;    &#x2F;&#x2F;是否可以访问共享内存，用于进程间的同步</span><br><span class="line">char msg[2048];    &#x2F;&#x2F;共享内存的信息</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="进程同步之Unix域套接字：一般使用与网络当中"><a href="#进程同步之Unix域套接字：一般使用与网络当中" class="headerlink" title="进程同步之Unix域套接字：一般使用与网络当中"></a>进程同步之Unix域套接字：一般使用与网络当中</h3><p>1.过程：<br>对于服务端来说：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">1.创建套接字(socket)</span><br><span class="line"></span><br><span class="line">2.绑定套接字</span><br><span class="line"></span><br><span class="line">3.监听套接字</span><br><span class="line"></span><br><span class="line">4.接收并且处理信息</span><br><span class="line">以python代码为例：</span><br><span class="line">def server():</span><br><span class="line">    # 创建socket</span><br><span class="line">    s &#x3D; socket.socket()</span><br><span class="line">    host &#x3D; &quot;127.0.0.1&quot;</span><br><span class="line">    port &#x3D; 6666</span><br><span class="line">    #绑定套接字</span><br><span class="line">    s.bind((host,port))</span><br><span class="line">    #监听套接字</span><br><span class="line">    s.listen(5)</span><br><span class="line">    while True:</span><br><span class="line">        c,addr &#x3D; s.accept()</span><br><span class="line">        print(&#39;Addr: &#39;,addr)</span><br><span class="line">        c.send(b&#39;Welcome to my course.&#39;)</span><br><span class="line">        c.close()</span><br></pre></td></tr></table></figure>
+<p>以客户端为例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">1.创建套接字</span><br><span class="line"></span><br><span class="line">2.连接套接字</span><br><span class="line"></span><br><span class="line">3.发送消息</span><br><span class="line">以python为例：</span><br><span class="line">def client(i):</span><br><span class="line">    s&#x3D;socket.socket()                 #创建</span><br><span class="line">    s.connect((&#39;127.0.0.1&#39;,6666))     #建立连接</span><br><span class="line">    print(&#39;Recv Mesg:%s,Client id:%d&#39;%(s.recv(1024),i))</span><br><span class="line">    s.close()</span><br></pre></td></tr></table></figure>
+
+<h2 id="实践"><a href="#实践" class="headerlink" title="实践"></a>实践</h2><p><strong>任务要求：</strong><br>用户布置多个普通任务，这些任务都需要进入到任务队列当中进行排队，当线程池需要拿走这个任务，并且用一个线程来执行的时候，任务队列会出队一个任务到线程池当中执行，此时执行完用户是不知道任务结果的。<br>如果说用户还需要获取任务结果的话，那么它就需要提交异步任务到任务队列，线程池取出执行的时候，就能够使用异步的方法获取结果。</p>
+<h3 id="实现一个线程安全的队列"><a href="#实现一个线程安全的队列" class="headerlink" title="实现一个线程安全的队列"></a>实现一个线程安全的队列</h3><p>要求：</p>
+<ul>
+<li><p>该队列的方法至少有三个：获取当前数量，入队，出队操作</p>
+</li>
+<li><p>当多个线程同时访问队列元素的时候，为了保证多个线程获取的资源是串行的，避免产生死锁，因此需要使用锁进行保护。</p>
+</li>
+<li><p>队列为空的时候，会进行阻塞(使用条件变量，等待睡眠)<br>代码示例：</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br></pre></td><td class="code"><pre><span class="line"># ! _*_ encoding&#x3D;utf-8 _*_</span><br><span class="line">import  threading</span><br><span class="line">import time</span><br><span class="line">#定义线程安全的队列</span><br><span class="line">class ThreadSafeQueueException(Exception):   &#x2F;&#x2F;抛出异常</span><br><span class="line">    pass</span><br><span class="line">class ThreadQueue(object):</span><br><span class="line">    def __init__(self,max_size&#x3D;0):</span><br><span class="line">        self.queue &#x3D; []                     #队列</span><br><span class="line">        self.max_size&#x3D; max_size</span><br><span class="line">        self.lock &#x3D; threading.Lock()         #互斥锁</span><br><span class="line">        self.condition &#x3D; threading.Condition()    #条件变量</span><br><span class="line"></span><br><span class="line">    def size(self):                 #获取队列元素数量</span><br><span class="line">        self.lock.acquire()          #加锁</span><br><span class="line">        size &#x3D; len(self.queue)</span><br><span class="line">        self.lock.release()          #解锁</span><br><span class="line">        return  size</span><br><span class="line">    def put(self,item):            #加入一个元素到队列当中</span><br><span class="line">        if self.size()&gt;self.max_size and self.max_size!&#x3D;0:    #若发生异常</span><br><span class="line">            return ThreadSafeQueueException</span><br><span class="line">        self.lock.acquire()</span><br><span class="line">        self.queue.append(item)</span><br><span class="line">        self.lock.release()</span><br><span class="line">        self.condition.acquire()</span><br><span class="line">        self.condition.notify()                #加入一个元素就通知其它线程告诉他们队列当中有元素</span><br><span class="line">        self.condition.release()</span><br><span class="line">    def put_list(self,item_list):            #加入一组元素</span><br><span class="line">        if not isinstance(item_list,list):              #判断是否为list</span><br><span class="line">            item_list&#x3D;list(item_list)</span><br><span class="line">        for item in item_list:</span><br><span class="line">            self.put(item)</span><br><span class="line">    def pop(self,block &#x3D; False,time &#x3D; None):                #取出队列元素</span><br><span class="line">        if self.size() &#x3D;&#x3D;0:</span><br><span class="line">            if block:                                 #判断是否需要阻塞</span><br><span class="line">                if time &#x3D;&#x3D; None:</span><br><span class="line">                    time &#x3D; 0</span><br><span class="line">                self.condition.acquire()</span><br><span class="line">                self.condition.wait(timeout&#x3D;time)      #阻塞等待</span><br><span class="line">                self.condition.release()</span><br><span class="line">            else:</span><br><span class="line">                return None</span><br><span class="line">        # if self.size() &#x3D;&#x3D;0:</span><br><span class="line">        #     return  None                           #但是可能现在size为0，但是由于是多线程，下一个转台任务队列可能也为0，被取走了，</span><br><span class="line">        #也就是说44到46行之间，尽管可能判断size不为0，但是这一瞬间可能就被取走了，为0。</span><br><span class="line">        self.lock.acquire()</span><br><span class="line">        item &#x3D; None</span><br><span class="line">        if len(self.queue)&gt;0:</span><br><span class="line">            item &#x3D; self.queue.pop()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        self.lock.release()</span><br><span class="line">        return item</span><br><span class="line"></span><br><span class="line">    def get(self,index):           #获取某一个位置的元素</span><br><span class="line">        self.lock.acquire()</span><br><span class="line">        item &#x3D; self.queue[index]</span><br><span class="line">        self.lock.release()</span><br><span class="line">        return item</span><br><span class="line">if __name__ &#x3D;&#x3D; &#39;__main__&#39;:</span><br><span class="line">    queue &#x3D; ThreadQueue(max_size&#x3D;100)</span><br><span class="line">    def producer():             #生产者</span><br><span class="line">        while True:</span><br><span class="line">            queue.put(1)</span><br><span class="line">            time.sleep(1)</span><br><span class="line">    def consumer():             #消费者</span><br><span class="line">        while True:</span><br><span class="line">            item &#x3D; queue.pop(block&#x3D;True,time&#x3D;2)</span><br><span class="line">            print(&#39;from queue: %d&#39;%item)</span><br><span class="line">            time.sleep(1)</span><br><span class="line"></span><br><span class="line">    thread1 &#x3D; threading.Thread(target&#x3D;producer)            #绑定对应线程</span><br><span class="line">    thread2 &#x3D; threading.Thread(target&#x3D;consumer)</span><br><span class="line">    thread1.start()</span><br><span class="line">    thread2.start()</span><br><span class="line">    thread1.join()</span><br><span class="line">    thread2.join()</span><br></pre></td></tr></table></figure>
+
+<h3 id="实现基本任务对象Task"><a href="#实现基本任务对象Task" class="headerlink" title="实现基本任务对象Task"></a>实现基本任务对象Task</h3><p>要求：<br>Task类里面必须有任务参数，唯一标记以及这个任务的执行逻辑：<br>python代码示例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">import  uuid</span><br><span class="line">import threading</span><br><span class="line">class Task:</span><br><span class="line">    def __init__(self,func,*args,**kwargs):    #func代表任务具体逻辑，使用函数引用传递进来</span><br><span class="line">        self.id &#x3D; uuid.uuid4()      &#x2F;&#x2F;利用uuid得到任务id</span><br><span class="line">        self.callable &#x3D; func        &#x2F;&#x2F;Task具体逻辑，通过函数引用</span><br><span class="line">        self.args &#x3D; args</span><br><span class="line">        self.kwargs &#x3D; kwargs</span><br><span class="line">    def __str__(self):</span><br><span class="line">        return &#39;Task id:&#39; + str(self.id)      &#x2F;&#x2F;该方法可以返回任务id</span><br></pre></td></tr></table></figure>
+
+<h3 id="实现异步任务对象"><a href="#实现异步任务对象" class="headerlink" title="实现异步任务对象"></a>实现异步任务对象</h3><p>这个继承Task类，之前Task使用的属性异步任务对象都需要，但是因为要获取任务结果，因此需要定义一个结果变量，而且当任务还没结束，也就是说结果还没有的时候，不能获取结果，只能等待，如果结果出来了才可以获取，此时需要用到条件变量<br>代码示例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">#异步任务对象</span><br><span class="line">class AsyncTask(Task):                           #继承Task</span><br><span class="line">    def __init__(self,func,*args,**kwargs):</span><br><span class="line">        self.result &#x3D; None     #任务结果</span><br><span class="line">        self.condition&#x3D;threading.Condition()     #条件变量</span><br><span class="line">        super().__init__(func,*args,**kwargs)       #调用Task的构造函数</span><br><span class="line">    def set_result(self,result):                    #加入任务结果，通知线程进行相应的获取</span><br><span class="line">        self.condition.acquire()                   #加锁</span><br><span class="line">        self.result&#x3D;result          </span><br><span class="line">        self.condition.notify()                    #通知</span><br><span class="line">        self.condition.release()                   #解锁</span><br><span class="line">    def get_result(self):</span><br><span class="line">        self.condition.acquire()</span><br><span class="line">        if not self.result:</span><br><span class="line">            self.condition.wait()                 #没有结果就睡眠，直到满足条件为止</span><br><span class="line">        result &#x3D; self.result</span><br><span class="line">        self.condition.release()</span><br><span class="line">        return result</span><br></pre></td></tr></table></figure>
+<h3 id="实现任务处理线程"><a href="#实现任务处理线程" class="headerlink" title="实现任务处理线程"></a>实现任务处理线程</h3><p>要求：</p>
+<ul>
+<li><p>从任务队列当中不断取任务执行，即需要传入任务队列</p>
+</li>
+<li><p>需要一个标记，标记线程什么时候结束，以便于获得结果</p>
+</li>
+<li><p>需要线程处理逻辑</p>
+</li>
+</ul>
+<p>代码示例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">import  threading</span><br><span class="line">import psutil</span><br><span class="line">from operate_system.Task import Task,AsyncTask</span><br><span class="line">from operate_system.Queue import ThreadQueue</span><br><span class="line">class ProcessThread(threading.Thread):</span><br><span class="line">    def __init__(self,task_queue,*args,**kwargs):</span><br><span class="line">        threading.Thread.__init__(self,*args,**kwargs)</span><br><span class="line">        self.task_queue &#x3D; task_queue         #任务队列</span><br><span class="line">        self.args &#x3D; args</span><br><span class="line">        self.kwargs &#x3D; kwargs</span><br><span class="line">        self.dismiss_flag &#x3D; threading.Event()         #任务线程停止标记</span><br><span class="line">    def run(self):</span><br><span class="line">        while True:</span><br><span class="line">            if self.dismiss_flag.is_set():            #如果停止</span><br><span class="line">                break</span><br><span class="line">            task &#x3D; self.task_queue.pop()</span><br><span class="line">            if not isinstance(task,Task):</span><br><span class="line">                continue</span><br><span class="line">            result &#x3D; task.callable(*task.args,**task.kwargs)    #通过函数调用执行函数逻辑，获得任务结果</span><br><span class="line">            if isinstance(task,AsyncTask):       #如果任务是异步任务，需要加入任务结果</span><br><span class="line">                task.set_result(result)</span><br><span class="line">    def dismiss(self):</span><br><span class="line">        self.dismiss_flag.set()</span><br><span class="line">    def stop(self):               #结束线程</span><br><span class="line">        self.dismiss()</span><br></pre></td></tr></table></figure>
+<h3 id="实现线程池"><a href="#实现线程池" class="headerlink" title="实现线程池"></a>实现线程池</h3><h4 id="线程池介绍"><a href="#线程池介绍" class="headerlink" title="线程池介绍"></a>线程池介绍</h4><p>1.定义：线程池是存放多个线程的容器，CPU在线程池当中调度线程执行完毕以后不会进行销毁，而是把线程放入到线程池当中继续使用，避免不必要的开销。</p>
+<p>2。为什么要使用线程池：</p>
+<ul>
+<li><p>线程是稀缺资源，不应该频繁创建销毁(涉及到上下文新老线程切换)，这也太消耗资源和空间了</p>
+</li>
+<li><p>架构解耦，线程池能够使线程的创建和业务处理解耦，也就是说，我这个线程不是我想执行这个任务的时候才创建，而是提前创建好，使程序和服务更加优雅</p>
+</li>
+<li><p>其是使用线程池的最佳实践，像阿里巴巴的Java黄金手册里面明文要求必须使用线程池，说明大公司很看重这个，这个可以减少开销，而且效率高。</p>
+</li>
+</ul>
+<h4 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">class  ThreadPool:</span><br><span class="line">    def __init__(self,size &#x3D; 0):</span><br><span class="line">        if not size:                        #如果size&#x3D;0</span><br><span class="line">            size &#x3D; psutil.cpu_count()*2              #约定线程池的大小位CPU核数的两倍</span><br><span class="line">        self.pool &#x3D; ThreadQueue(size)                 #大小为size的线程池</span><br><span class="line">        #任务队列</span><br><span class="line">        self.queue &#x3D; ThreadQueue()                    #任务队列</span><br><span class="line">        for i in range(size):</span><br><span class="line">            self.pool.put(ProcessThread(self.queue))     #往线程池当中加入任务处理线程</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    def start(self):                             #线程池开始执行</span><br><span class="line">        for i in range(self.pool.size()):</span><br><span class="line">            thread &#x3D; self.pool.get(i)</span><br><span class="line">            thread.start()                    #执行线程</span><br><span class="line">    def put(self,item):                    #往线程池当中提交任务</span><br><span class="line">        if not isinstance(item,Task):</span><br><span class="line">            raise TaskTypeErrorException        #抛出异常</span><br><span class="line">        self.queue.put(item)                     </span><br><span class="line">    def batch_put(self,item_list):         #批量提交</span><br><span class="line">        if not isinstance(item_list,list):</span><br><span class="line">            item_list&#x3D;list(item_list)</span><br><span class="line">        for item in item_list:</span><br><span class="line">            self.put(item)</span><br><span class="line">    def size(self):</span><br><span class="line">        return self.pool.size()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    def join(self):                           #结束线程池</span><br><span class="line">        for i in range(self.pool.size()):</span><br><span class="line">            thread &#x3D; self.pool.get(i)</span><br><span class="line">            thread.stop()</span><br><span class="line">        while self.pool.size():</span><br><span class="line">            thread &#x3D; self.pool.pop()</span><br><span class="line">            thread.join()</span><br><span class="line">class TaskTypeErrorException(Exception):</span><br><span class="line">    pass</span><br></pre></td></tr></table></figure>
+
+<h3 id="综合"><a href="#综合" class="headerlink" title="综合"></a>综合</h3><p>代码测试：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line"># ! _*_ encoding&#x3D;utf-8 _*_</span><br><span class="line">from operate_system import Task,pool     #引入我们之前写的Task，pool文件</span><br><span class="line">import time</span><br><span class="line">class SimpleTask(Task.Task):             #任务对象</span><br><span class="line">    def __init__(self,callable):</span><br><span class="line">        super(SimpleTask,self).__init__(callable)</span><br><span class="line">def process():                            #任务逻辑</span><br><span class="line">    print(&#39;This is a simple task&#39;)</span><br><span class="line">    time.sleep(100)</span><br><span class="line"></span><br><span class="line">def test():                               #基本任务测试</span><br><span class="line">    #1.初始化一个线程池</span><br><span class="line">    test_pool &#x3D; pool.ThreadPool()          #创建线程池</span><br><span class="line">    test_pool.start()                      #执行线程池</span><br><span class="line"></span><br><span class="line">    #2.生成一系列任务</span><br><span class="line">    for i in range(10):</span><br><span class="line">        simple_Task&#x3D;SimpleTask(process)        #加入逻辑，并且生成任务</span><br><span class="line">        test_pool.put(simple_Task)              #提交任务并且执行</span><br><span class="line">    #3.往线程池提交任务并且执行</span><br><span class="line">    pass</span><br><span class="line">def test_AsyncTask():                          #异步任务测试</span><br><span class="line">    def Async_process():                       #任务逻辑</span><br><span class="line">        num&#x3D;0</span><br><span class="line">        for i in range(100):</span><br><span class="line">            num+&#x3D;1</span><br><span class="line">        return num</span><br><span class="line">    # 1.初始化一个线程池</span><br><span class="line">    test_pool &#x3D; pool.ThreadPool()</span><br><span class="line">    test_pool.start()</span><br><span class="line"></span><br><span class="line">    # 2.生成一系列任务</span><br><span class="line">    for i in range(10):</span><br><span class="line">        Async_Task &#x3D; Task.AsyncTask(func&#x3D;Async_process)      #生成异步任务</span><br><span class="line">        test_pool.put(Async_Task)                            #提交任务</span><br><span class="line">        result &#x3D; Async_Task.get_result()                       #获取结果</span><br><span class="line">        print(&#39;get result:%d&#39;%result)</span><br><span class="line">    # 3.往线程池提交任务并且执行</span><br><span class="line">def test_AsyncTask2():          #测试是否等待</span><br><span class="line">    def Async_process():</span><br><span class="line">        num&#x3D;0</span><br><span class="line">        for i in range(100):</span><br><span class="line">            num+&#x3D;1</span><br><span class="line">        time.sleep(1)</span><br><span class="line">        return num</span><br><span class="line">    # 1.初始化一个线程池</span><br><span class="line">    test_pool &#x3D; pool.ThreadPool()</span><br><span class="line">    test_pool.start()</span><br><span class="line"></span><br><span class="line">    # 2.生成一系列任务</span><br><span class="line">    for i in range(10):</span><br><span class="line">        Async_Task &#x3D; Task.AsyncTask(func&#x3D;Async_process)</span><br><span class="line">        test_pool.put(Async_Task)</span><br><span class="line">        print(&#39;time start:%d&#39;%time.time())</span><br><span class="line">        result &#x3D; Async_Task.get_result()</span><br><span class="line">        print(&#39;get result:%d:%d&#39;%(time.time(),result))</span><br><span class="line">    # 3.往线程池提交任务并且执行</span><br><span class="line">if __name__ &#x3D;&#x3D;&#39;__main__&#39;:</span><br><span class="line">    # test()</span><br><span class="line">    # test_AsyncTask()</span><br><span class="line">    test_AsyncTask2()</span><br><span class="line">    pass</span><br></pre></td></tr></table></figure>
+<h1 id="完结"><a href="#完结" class="headerlink" title="完结"></a>完结</h1><p>操作系统的讲解到此完毕，这是博主自学操作系统时的心得，理解和总结，对于操作系统，我们还必须了解的就是Linux操作系统了，对于Linux操作系统，博主到时也会出一篇详细的讲解博客，欲知下回如何，敬请期待！</p>
+</article><!-- lincense--><div class="license-wrapper"><p> <span>Author:  </span><a href="http://liujunchi-bot.github.io">John Doe</a></p><p> <span>Link:  </span><a href="http://liujunchi-bot.github.io/2020/02/19/caozuoxitong/">http://liujunchi-bot.github.io/2020/02/19/caozuoxitong/</a></p><p> <span>Copyright:  </span><span>All articles in this blog are licensed under <a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-nd/3.0" target="_blank">CC BY-NC-SA 3.0</a> unless stating additionally.</span></p></div><div class="post-paginator"><a class="nextSlogan" href="/2020/02/05/FaceDetect/" title="云开发：让你拥有自己的第一个的AI人脸识别小程序"><span>NextPost ></span><br><span class="nextTitle">云开发：让你拥有自己的第一个的AI人脸识别小程序</span></a><div class="clear"></div></div><div id="comment"><div id="container"></div><link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css"><script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script><script>var gitment = new Gitment({
+  //- id: '玩转操作系统',
+  //- owner: 'liujunchi-bot',
+  //- repo: 'Blog-Comment',
+  //- oauth: {
+  //-   client_id: 'fcc11412ea5eb9310de3',
+  //-   client_secret: 'fb83a32085e0e8570fd37c38d4909a2436776fde',
+  //- },
+  id: '{% raw %}{{ page.date }}{% endraw %}',
+  owner: 'liujunchi-bot',
+  repo: 'Blog-Comment',
+  oauth: {
+    client_id: 'fcc11412ea5eb9310de3',
+    client_secret: 'fb83a32085e0e8570fd37c38d4909a2436776fde',
+  },
+})
+gitment.render('container')</script></div></section></article><footer id="cxo-footer-outer"><div id="cxo-footer-inner"><p class="footer-container"><span>Site by </span><a href="http://hexo.io" target="_blank" rel="noopener"><span>Hexo</span></a><span> | theme </span><a href="https://github.com/Longlongyu/hexo-theme-Cxo" target="_blank" rel="noopener"><span>Cxo</span></a></p><i class="fa fa-user"> </i><span id="busuanzi_value_site_uv"></span><span> | </span><i class="fa fa-eye"> </i><span id="busuanzi_value_site_pv"></span></div></footer><!-- catelog--><div class="toc-wrapper" style="top: 70vh;"><div class="toc-catalog"><i class="fa fa-list"> </i><span>CATALOG</span></div><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#操作系统概述"><span class="toc-number">1.</span> <span class="toc-text">操作系统概述</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#操作系统相关概念"><span class="toc-number">1.0.1.</span> <span class="toc-text">操作系统相关概念</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#操作系统之进程管理"><span class="toc-number">2.</span> <span class="toc-text">操作系统之进程管理</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#进程实体"><span class="toc-number">2.1.</span> <span class="toc-text">进程实体</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#进程实体-1"><span class="toc-number">2.1.1.</span> <span class="toc-text">进程实体</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#五状态模型"><span class="toc-number">2.2.</span> <span class="toc-text">五状态模型</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#进程同步"><span class="toc-number">2.3.</span> <span class="toc-text">进程同步</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#两种模型"><span class="toc-number">2.3.1.</span> <span class="toc-text">两种模型</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#进程同步-1"><span class="toc-number">2.3.2.</span> <span class="toc-text">进程同步</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Linux的进程管理"><span class="toc-number">2.4.</span> <span class="toc-text">Linux的进程管理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Linux系统当中进程的相关概念"><span class="toc-number">2.4.1.</span> <span class="toc-text">Linux系统当中进程的相关概念</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Linux进程的相关操作命令"><span class="toc-number">2.4.2.</span> <span class="toc-text">Linux进程的相关操作命令</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#作业管理"><span class="toc-number">3.</span> <span class="toc-text">作业管理</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#进程调度"><span class="toc-number">3.1.</span> <span class="toc-text">进程调度</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#死锁"><span class="toc-number">3.2.</span> <span class="toc-text">死锁</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#存储管理"><span class="toc-number">4.</span> <span class="toc-text">存储管理</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#内存分配与回收"><span class="toc-number">4.1.</span> <span class="toc-text">内存分配与回收</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#内存分配"><span class="toc-number">4.1.1.</span> <span class="toc-text">内存分配</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#内存回收"><span class="toc-number">4.1.2.</span> <span class="toc-text">内存回收</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#段页式存储管理"><span class="toc-number">4.2.</span> <span class="toc-text">段页式存储管理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#页式存储管理"><span class="toc-number">4.2.1.</span> <span class="toc-text">页式存储管理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#段式存储管理"><span class="toc-number">4.2.2.</span> <span class="toc-text">段式存储管理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#段页式存储管理-1"><span class="toc-number">4.2.3.</span> <span class="toc-text">段页式存储管理</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#虚拟内存"><span class="toc-number">4.3.</span> <span class="toc-text">虚拟内存</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Linux的存储管理"><span class="toc-number">4.4.</span> <span class="toc-text">Linux的存储管理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Buddy内存管理算法"><span class="toc-number">4.4.1.</span> <span class="toc-text">Buddy内存管理算法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Linux交换空间"><span class="toc-number">4.4.2.</span> <span class="toc-text">Linux交换空间</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#文件管理"><span class="toc-number">5.</span> <span class="toc-text">文件管理</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#操作系统的文件管理"><span class="toc-number">5.1.</span> <span class="toc-text">操作系统的文件管理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#文件的逻辑结构"><span class="toc-number">5.1.1.</span> <span class="toc-text">文件的逻辑结构</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#辅存存储空间的分配"><span class="toc-number">5.1.2.</span> <span class="toc-text">辅存存储空间的分配</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#目录管理"><span class="toc-number">5.1.3.</span> <span class="toc-text">目录管理</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Linux文件的基本操作"><span class="toc-number">5.2.</span> <span class="toc-text">Linux文件的基本操作</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Linux文件系统"><span class="toc-number">5.3.</span> <span class="toc-text">Linux文件系统</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#设备管理"><span class="toc-number">6.</span> <span class="toc-text">设备管理</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#IO设备"><span class="toc-number">6.1.</span> <span class="toc-text">IO设备</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#分类"><span class="toc-number">6.2.</span> <span class="toc-text">分类</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#IO设备缓冲区"><span class="toc-number">6.3.</span> <span class="toc-text">IO设备缓冲区</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#SPOOLING技术"><span class="toc-number">6.4.</span> <span class="toc-text">SPOOLING技术</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#拓展"><span class="toc-number">7.</span> <span class="toc-text">拓展</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#线程同步之自旋锁"><span class="toc-number">7.0.1.</span> <span class="toc-text">线程同步之自旋锁</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#线程同步之条件变量"><span class="toc-number">7.0.2.</span> <span class="toc-text">线程同步之条件变量</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#使用fork函数系统调用创建进程"><span class="toc-number">7.0.3.</span> <span class="toc-text">使用fork函数系统调用创建进程</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#进程同步-2"><span class="toc-number">7.1.</span> <span class="toc-text">进程同步</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#进程同步之共享内存"><span class="toc-number">7.1.1.</span> <span class="toc-text">进程同步之共享内存</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#进程同步之Unix域套接字：一般使用与网络当中"><span class="toc-number">7.1.2.</span> <span class="toc-text">进程同步之Unix域套接字：一般使用与网络当中</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#实践"><span class="toc-number">7.2.</span> <span class="toc-text">实践</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#实现一个线程安全的队列"><span class="toc-number">7.2.1.</span> <span class="toc-text">实现一个线程安全的队列</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#实现基本任务对象Task"><span class="toc-number">7.2.2.</span> <span class="toc-text">实现基本任务对象Task</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#实现异步任务对象"><span class="toc-number">7.2.3.</span> <span class="toc-text">实现异步任务对象</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#实现任务处理线程"><span class="toc-number">7.2.4.</span> <span class="toc-text">实现任务处理线程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#实现线程池"><span class="toc-number">7.2.5.</span> <span class="toc-text">实现线程池</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#线程池介绍"><span class="toc-number">7.2.5.1.</span> <span class="toc-text">线程池介绍</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#代码实现"><span class="toc-number">7.2.5.2.</span> <span class="toc-text">代码实现</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#综合"><span class="toc-number">7.2.6.</span> <span class="toc-text">综合</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#完结"><span class="toc-number">8.</span> <span class="toc-text">完结</span></a></li></ol></div><!-- top--><i class="fa fa-arrow-up close" id="go-up" aria-hidden="true"></i></body></html>
