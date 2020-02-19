@@ -189,7 +189,7 @@
 <li><p>这也可以使资源利用率大大提升</p>
 </li>
 </ul>
-<h3 id="进程实体-1"><a href="#进程实体-1" class="headerlink" title="进程实体"></a>进程实体</h3><p>1.主存当中的进程状态：在主存当中，进程其实就是一段连续的存储空间，(至于为什么会连续的存储，那就涉及到<strong>局部性原理</strong>了，局部性原理博主已经在博客<strong>《吃透计算机组成原理》</strong>当中讲的比较清楚了，大家感兴趣可以去看看。)这一段存储空间也称为进程控制块。<br><strong>说到进程控制块，博主就展开叙述它的常用具体内容：</strong><br><img src="https://bkimg.cdn.bcebos.com/pic/500fd9f9d72a60596e71d6f82b34349b023bbaea?x-bce-process=image/watermark,g_7,image_d2F0ZXIvYmFpa2U4MA==,xp_5,yp_5" alt="进程控制块"></p>
+<h3 id="进程实体-1"><a href="#进程实体-1" class="headerlink" title="进程实体"></a>进程实体</h3><p>1.主存当中的进程状态：在主存当中，进程其实就是一段连续的存储空间，(至于为什么会连续的存储，那就涉及到<strong>局部性原理</strong>了，局部性原理博主已经在博客<strong>《吃透计算机组成原理》</strong>当中讲的比较清楚了，大家感兴趣可以去看看。)这一段存储空间也称为进程控制块。<br><strong>说到进程控制块，博主就展开叙述它的常用具体内容：</strong><br><img src="/2020/02/19/caozuoxitong/%E8%BF%9B%E7%A8%8B%E6%8E%A7%E5%88%B6%E5%9D%97.png" alt="进程控制块"></p>
 <ul>
 <li><p>标识符(Identifier)：就是相当于给进程去一个名字ID，让我们认识这是哪一个进程，并且标记是唯一的。</p>
 </li>
@@ -218,7 +218,7 @@
 </li>
 </ul>
 <p><strong>3.进程与线程：</strong><br>对进程和线程我们必须区分开来，<strong>进程包括很多线程，一个进程对应一个或者多个线程，可以说进程是线程的爸爸</strong>。一个进程好比一个程序，而线程就相当于这个程序当中的每个任务(界面展开，菜单选择，打开，关闭，执行等等)，那我们来了解一下进程与线程的关系：</p>
-<p><img src="https://images2015.cnblogs.com/blog/1048430/201707/1048430-20170710140043259-1480436304.png" alt="进程与线程"></p>
+<p><img src="/2020/02/19/caozuoxitong/%E8%BF%9B%E7%A8%8B%E4%B8%8E%E7%BA%BF%E7%A8%8B.png" alt="进程与线程"></p>
 <ul>
 <li><p>线程是系统进行运行调度的最小单位，而进程是基本单位</p>
 </li>
@@ -234,15 +234,15 @@
 <p>3.执行状态：进程获得CPU使用权，使得程序执行。</p>
 <p>4.阻塞状态：因为某种原因进程放弃了CPU，而进入阻塞状态。比如说进程需要使用打印机，但是发出请求以后，打印机并未准备就绪，此时无法执行，进入阻塞状态。</p>
 <p>5.终止状态：进程执行完毕，此时系统会清理进程内存，并且归还PCB。</p>
-<p>五个状态之间的关系：<br><img src="https://img2018.cnblogs.com/blog/1542696/201907/1542696-20190730145010685-93845600.png" alt="五状态模型"></p>
-<h2 id="进程同步"><a href="#进程同步" class="headerlink" title="进程同步"></a>进程同步</h2><h3 id="两种模型"><a href="#两种模型" class="headerlink" title="两种模型"></a>两种模型</h3><p><strong>在了解进程同步之前，我们需要了解两种模型，来加深对进程同步的理解，以及了解为什么会要求进程同步：</strong><br>1.生产者-消费者模型：<br><img src="https://img-blog.csdnimg.cn/20190409124001598.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2x2eGluMTUzNTM3MTU3OTA=,size_16,color_FFFFFF,t_70" alt="生产者消费者模型"><br><strong>模型概述：</strong>生产者每生产一个进程便把进程都放入到仓库，即缓冲区里面，此时仓库进程数量加一，然后消费者需要执行某一个进程的时候，便会把对应的进程取出来，此时仓库里进程数量减一，其中缓冲区位于缓存Cache当中。</p>
+<p>五个状态之间的关系：<br><img src="/2020/02/19/caozuoxitong/%E4%BA%94%E7%8A%B6%E6%80%81%E6%A8%A1%E5%9E%8B.png" alt="五状态模型"></p>
+<h2 id="进程同步"><a href="#进程同步" class="headerlink" title="进程同步"></a>进程同步</h2><h3 id="两种模型"><a href="#两种模型" class="headerlink" title="两种模型"></a>两种模型</h3><p><strong>在了解进程同步之前，我们需要了解两种模型，来加深对进程同步的理解，以及了解为什么会要求进程同步：</strong><br>1.生产者-消费者模型：<br><img src="/2020/02/19/caozuoxitong/%E7%94%9F%E4%BA%A7%E8%80%85-%E6%B6%88%E8%B4%B9%E8%80%85%E6%A8%A1%E5%9E%8B.png" alt="生产者消费者模型"><br><strong>模型概述：</strong>生产者每生产一个进程便把进程都放入到仓库，即缓冲区里面，此时仓库进程数量加一，然后消费者需要执行某一个进程的时候，便会把对应的进程取出来，此时仓库里进程数量减一，其中缓冲区位于缓存Cache当中。</p>
 <p><strong>模型过程(特殊情况下)：</strong><br>假设register表示某个部分(生产者或者消费者)的进程的数量，count表示缓存当中进程的数量。<br>生产者过程：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">register &#x3D; count      &#x2F;&#x2F;1</span><br><span class="line">register &#x3D; register+1    &#x2F;&#x2F;2</span><br><span class="line">count&#x3D;register           &#x2F;&#x2F;3</span><br></pre></td></tr></table></figure>
 <p>消费者过程：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">register &#x3D; count        &#x2F;&#x2F;1</span><br><span class="line">register &#x3D; register-1   &#x2F;&#x2F;2</span><br><span class="line">count &#x3D; register       &#x2F;&#x2F;3</span><br></pre></td></tr></table></figure>
 <p>假设缓冲区里面有10个进程，此时若是生产者生产一个进程，消费者也消费一个进程，那么按理来说，最终缓存区的进程还是十个，是不是这也呢，我们来模拟一下。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">由于操作系统当中是并发性执行操作的，因此不一定是按照顺序来，有时候进程会断断续续，比如说生产操作的进程</span><br><span class="line">1.生产者执行生产者的第一步，register&#x3D;count此时，register生产&#x3D;10，count&#x3D;10</span><br><span class="line">2.生产者执行第二步，register&#x3D;register+1，此时register生产&#x3D;11，count&#x3D;10</span><br><span class="line">3.由于并发，此时可能是生产者断了，消费者开始执行第一步，register消费&#x3D;count，此时，register消费&#x3D;10，count&#x3D;10</span><br><span class="line">4.消费者执行第二步，register消费&#x3D;register消费-1，此时register消费&#x3D;9，count&#x3D;10</span><br><span class="line">5.消费者执行第三步，count&#x3D;register消费，此时register消费&#x3D;9，count&#x3D;10</span><br><span class="line">6.生产者又开始了，执行它的第三步，count&#x3D;register生产，此时count&#x3D;11，register生产&#x3D;11</span><br><span class="line">咦，奇怪了，我们按理来说这个缓冲区进程数量应该是10，为什么实际过程当中却变成了11呢，好，问题暂时留在这里。</span><br></pre></td></tr></table></figure>
-<p>2.哲学家进餐模型：<br>概述：有五个哲学家，他们在一张大圆桌上吃饭，总共有五个叉子，每个哲学家左右手各一个，规定当左右手都拿到叉子时，才能够进餐。<br><img src="https://img2018.cnblogs.com/blog/947879/201903/947879-20190327143737038-1696399331.jpg" alt="哲学家进餐"><br>两种情况：<br>理想情况下：<br>拿左边的叉子-&gt;右边没有叉子，等待-&gt;右边哲学家释放叉子-&gt;拿起右边叉子-&gt;进餐</p>
+<p>2.哲学家进餐模型：<br>概述：有五个哲学家，他们在一张大圆桌上吃饭，总共有五个叉子，每个哲学家左右手各一个，规定当左右手都拿到叉子时，才能够进餐。<br><img src="/2020/02/19/caozuoxitong/%E5%93%B2%E5%AD%A6%E5%AE%B6%E8%BF%9B%E9%A4%90.jpg" alt="哲学家进餐"><br>两种情况：<br>理想情况下：<br>拿左边的叉子-&gt;右边没有叉子，等待-&gt;右边哲学家释放叉子-&gt;拿起右边叉子-&gt;进餐</p>
 <p>实际特殊情况下：<br>5个人同时拿起左边的叉子-&gt;都发现右边没有叉子-&gt;等待-&gt;一直没有叉子，都在等待-&gt;最终饿死</p>
 <p><strong>为什么会这样呢？他们之间没有进行通信，没有互相告诉对方我干了什么，好像有点道理，是会这样发生，为了解决这个问题以及上面的生产者-消费者模型，我们来学习进程同步吧。</strong></p>
 <h3 id="进程同步-1"><a href="#进程同步-1" class="headerlink" title="进程同步"></a>进程同步</h3><p>1.目的：</p>
@@ -392,7 +392,7 @@
 </li>
 </ul>
 <h2 id="死锁"><a href="#死锁" class="headerlink" title="死锁"></a>死锁</h2><p>1.定义：两个或者两个以上的进程在执行过程中，由于竞争资源或者彼此通信而造成的一种阻塞现象，如果没有外力作用，那么都会无法推进，互相等待僵死，产生死锁状态。</p>
-<p><img src="https://bkimg.cdn.bcebos.com/pic/810a19d8bc3eb1354547b744a51ea8d3fc1f4448?x-bce-process=image/watermark,g_7,image_d2F0ZXIvYmFpa2U4MA==,xp_5,yp_5" alt="死锁"></p>
+<p><img src="/2020/02/19/caozuoxitong/%E6%AD%BB%E9%94%81.png" alt="死锁"></p>
 <p>就好比T1和T2都在使用资源R1和R2，但是此时T1请求使用R2，T2请求使用R1，但是双方都在占用，不肯放弃，互相等待，因此就产生了死锁状态。</p>
 <p>2.死锁的产生：</p>
 <ul>
@@ -479,12 +479,12 @@
 </li>
 </ul>
 <p><strong>注意！！！页面大小的选取必须适当，如果过大则难以分配，如果过小则会造成内存碎片过多(空闲区大于页面的时候，空闲区空间过剩，形成碎片)</strong></p>
-<p>2.页表：逻辑空间与物理空间的映射。<br><img src="https://bkimg.cdn.bcebos.com/pic/377adab44aed2e7341d4f11e8301a18b87d6fac7?x-bce-process=image/watermark,g_7,image_d2F0ZXIvYmFpa2U4MA==,xp_5,yp_5" alt="页表"><br>页号代表其进程空间在逻辑上的存储，块号代表进程空间在对应物理空间上的存储</p>
+<p>2.页表：逻辑空间与物理空间的映射。<br><img src="/2020/02/19/caozuoxitong/%E9%A1%B5%E8%A1%A8.png" alt="页表"><br>页号代表其进程空间在逻辑上的存储，块号代表进程空间在对应物理空间上的存储</p>
 <p>3.地址表示：<br>一般时页号+页内偏移，其实可以类比于字块+字的地址</p>
 <p>4.多级页表：也就是说页表中还有页表，其存有页表的地址，当访问的时候，才会开辟对应的空间，这个也是为了避免页表太多而占用大量内存。</p>
 <p><strong>5.该存储方式的缺点：</strong>如果说把一段连续的逻辑分布在多个页面当中，就会大大降低存储效率，因为页面的存储是分散的。</p>
 <h3 id="段式存储管理"><a href="#段式存储管理" class="headerlink" title="段式存储管理"></a>段式存储管理</h3><p>1.特点：这个恰好与页式存储相反，它不是等分，而是按照进程逻辑进行空间分段，哪个逻辑占用空间大，其分配的段空间就大，并且段的长度是有连续的逻辑长度决定。</p>
-<p>2.段表：<br><img src="https://bkimg.cdn.bcebos.com/pic/bd315c6034a85edf487f056d43540923dc547589?x-bce-process=image/watermark,g_7,image_d2F0ZXIvYmFpa2U4MA==,xp_5,yp_5" alt="段表"><br>其中，段号就是指对应的段区域的ID，基址就是段的起始内存地址，段长就是指段的空间大小。</p>
+<p>2.段表：<br><img src="/2020/02/19/caozuoxitong/%E6%AE%B5%E8%A1%A8.png" alt="段表"><br>其中，段号就是指对应的段区域的ID，基址就是段的起始内存地址，段长就是指段的空间大小。</p>
 <p>3.地址表示：和页式存储类比，段号+段内偏移</p>
 <p>4.对比：</p>
 <table>
@@ -598,7 +598,7 @@
 </tr>
 </tbody></table>
 <p>2.顺序文件：顾名思义，就是按照顺序存放在存储介质中的文件，比如说磁带文件这种顺序性比较简单，使得存储效率很高，但是和我们所说的数组一样，不方便进行增删减改文件。<br>因此，针对这个缺点做出了改进：</p>
-<p><strong>3.索引文件：</strong>为了解决可变长文件的存储(增删减改)，这个需要使用到索引表完成存储。<br><img src="https://iknow-pic.cdn.bcebos.com/94cad1c8a786c917df946b44c63d70cf3bc75733?x-bce-process=image/resize,m_lfit,w_600,h_800,limit_1" alt="索引表"><br>索引表当中由键值(key)和逻辑地址(pointer)组成，键值可能就是文件建立的日期，而逻辑地址指向这个日期内建立的文件列表，增删减改只需要在对应键值当中修改地址，或者文件列表当中进行操作即可。</p>
+<p><strong>3.索引文件：</strong>为了解决可变长文件的存储(增删减改)，这个需要使用到索引表完成存储。<br><img src="/2020/02/19/caozuoxitong/%E7%B4%A2%E5%BC%95%E8%A1%A8.png" alt="索引表"><br>索引表当中由键值(key)和逻辑地址(pointer)组成，键值可能就是文件建立的日期，而逻辑地址指向这个日期内建立的文件列表，增删减改只需要在对应键值当中修改地址，或者文件列表当中进行操作即可。</p>
 <h3 id="辅存存储空间的分配"><a href="#辅存存储空间的分配" class="headerlink" title="辅存存储空间的分配"></a>辅存存储空间的分配</h3><p><strong>1.辅存的分配方式：</strong>分别有连续分配，链接分配(分为隐式链接和显式链接分配)以及索引分配：</p>
 <ul>
 <li><p>连续分配：按内存块的顺序进行分配，读取文件的速度快，但是对于存储文件的要求高，必须得要求其容量满足连续的存储空间，要刚刚好。</p>
@@ -619,7 +619,7 @@
 </tr>
 </tbody></table>
 <ul>
-<li>索引分配：把所有的文件的索引集中存储，每一个文件会离散地存储在多个盘块中，而且每个文件都有一个索引块来记录所有盘块的信息，在这个盘块中可以根据索引直接访问每一个盘块，如果说我们需要读取某个文件的时候，直接读取文件索引就可以了。<br><img src="https://img-blog.csdn.net/20180804170952531?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTE1ODcwNzA=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70" alt="索引分配"><br>比如说第十九个盘块存储了其它盘块的位置信息，通过19盘块可以找到索引其它盘块。</li>
+<li>索引分配：把所有的文件的索引集中存储，每一个文件会离散地存储在多个盘块中，而且每个文件都有一个索引块来记录所有盘块的信息，在这个盘块中可以根据索引直接访问每一个盘块，如果说我们需要读取某个文件的时候，直接读取文件索引就可以了。<br><img src="/2020/02/19/caozuoxitong/%E7%B4%A2%E5%BC%95%E5%88%86%E9%85%8D.png" alt="索引分配"><br>比如说第十九个盘块存储了其它盘块的位置信息，通过19盘块可以找到索引其它盘块。</li>
 </ul>
 <p>2.存储空间管理：分为空闲表，空闲链表，位示图。</p>
 <ul>
@@ -627,7 +627,7 @@
 </li>
 <li><p>空闲链表：类比空闲表，每一个节点存储第一个空闲盘块号和盘块数，存储在链表当中</p>
 </li>
-<li><p>位示图：位示图里面的信息有，每一行都代表这一个磁道，每一行里面存储着磁道号，以及磁道当中的盘块占用状态。<br><img src="https://bkimg.cdn.bcebos.com/pic/0e2442a7d933c895985c3f0ade1373f0820200a4?x-bce-process=image/watermark,g_7,image_d2F0ZXIvYmFpa2U4MA==,xp_5,yp_5" alt="位示图"><br>如上图，第一行存储盘块号，第一列存储磁道号，中间存储是否被占用的信息，1代表该盘块已经被占用，0代表空闲盘块。位示图比较好用，维护成本低，占用空间也小，而且还比较容易区找到空闲块。</p>
+<li><p>位示图：位示图里面的信息有，每一行都代表这一个磁道，每一行里面存储着磁道号，以及磁道当中的盘块占用状态。<br><img src="/2020/02/19/caozuoxitong/%E4%BD%8D%E7%A4%BA%E5%9B%BE.png" alt="位示图"><br>如上图，第一行存储盘块号，第一列存储磁道号，中间存储是否被占用的信息，1代表该盘块已经被占用，0代表空闲盘块。位示图比较好用，维护成本低，占用空间也小，而且还比较容易区找到空闲块。</p>
 </li>
 </ul>
 <h3 id="目录管理"><a href="#目录管理" class="headerlink" title="目录管理"></a>目录管理</h3><p>目录管理一般都会使用目录树：<br><img src="/2020/02/19/caozuoxitong/3.png" alt="目录树"></p>
@@ -772,7 +772,7 @@
 <ul>
 <li><p>利用高速共享设备将低速独享设备模拟为高速共享设备</p>
 </li>
-<li><p>把同步调用改为异步调用<br><img src="https://bkimg.cdn.bcebos.com/pic/b999a9014c086e06eab92e6406087bf40ad1cb88?x-bce-process=image/watermark,g_7,image_d2F0ZXIvYmFpa2U4MA==,xp_5,yp_5" alt="SPOOLING"><br>SPOOLING技术会把所有进程的输入数据和输出数据分别放入到输入井和输出井当中。</p>
+<li><p>把同步调用改为异步调用<br><img src="/2020/02/19/caozuoxitong/SPOOLING.jpg" alt="SPOOLING"><br>SPOOLING技术会把所有进程的输入数据和输出数据分别放入到输入井和输出井当中。</p>
 </li>
 </ul>
 <p><strong>3.过程：</strong></p>
