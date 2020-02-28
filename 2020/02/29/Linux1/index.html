@@ -1,0 +1,274 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"><meta name="author" content="John Doe"><meta name="renderer" content="webkit"><meta name="copyright" content="John Doe"><meta name="keywords" content="Hexo"><meta name="description" content=""><meta name="Cache-Control" content="no-cache"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><title>Linux操作系统入门到实战(一)：第一行代码 · Mr.Liu's Blog</title><link rel="stylesheet" href="/css/style.css?v=2018.7.9"><link rel="stylesheet" href="/css/animation.css?v=2018.7.9"><link rel="icon" href="/img/assets/favicon.ico"><link rel="stylesheet" href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css?version=1.5.6"><!-- scripts--><script>(function( w ){
+  "use strict";
+  // rel=preload support test
+  if( !w.loadCSS ){
+    w.loadCSS = function(){};
+  }
+  // define on the loadCSS obj
+  var rp = loadCSS.relpreload = {};
+  // rel=preload feature support test
+  // runs once and returns a function for compat purposes
+  rp.support = (function(){
+    var ret;
+    try {
+      ret = w.document.createElement( "link" ).relList.supports( "preload" );
+    } catch (e) {
+      ret = false;
+    }
+    return function(){
+      return ret;
+    };
+  })();
+
+  // if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+  // then change that media back to its intended value on load
+  rp.bindMediaToggle = function( link ){
+    // remember existing media attr for ultimate state, or default to 'all'
+    var finalMedia = link.media || "all";
+
+    function enableStylesheet(){
+      link.media = finalMedia;
+    }
+
+    // bind load handlers to enable media
+    if( link.addEventListener ){
+      link.addEventListener( "load", enableStylesheet );
+    } else if( link.attachEvent ){
+      link.attachEvent( "onload", enableStylesheet );
+    }
+
+    // Set rel and non-applicable media type to start an async request
+    // note: timeout allows this to happen async to let rendering continue in IE
+    setTimeout(function(){
+      link.rel = "stylesheet";
+      link.media = "only x";
+    });
+    // also enable media after 3 seconds,
+    // which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+    setTimeout( enableStylesheet, 3000 );
+  };
+
+  // loop through link elements in DOM
+  rp.poly = function(){
+    // double check this to prevent external calls from running
+    if( rp.support() ){
+      return;
+    }
+    var links = w.document.getElementsByTagName( "link" );
+    for( var i = 0; i < links.length; i++ ){
+      var link = links[ i ];
+      // qualify links to those with rel=preload and as=style attrs
+      if( link.rel === "preload" && link.getAttribute( "as" ) === "style" && !link.getAttribute( "data-loadcss" ) ){
+        // prevent rerunning on link
+        link.setAttribute( "data-loadcss", true );
+        // bind listeners to toggle media back
+        rp.bindMediaToggle( link );
+      }
+    }
+  };
+
+  // if unsupported, run the polyfill
+  if( !rp.support() ){
+    // run once at least
+    rp.poly();
+
+    // rerun poly on an interval until onload
+    var run = w.setInterval( rp.poly, 500 );
+    if( w.addEventListener ){
+      w.addEventListener( "load", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    } else if( w.attachEvent ){
+      w.attachEvent( "onload", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    }
+  }
+
+
+  // commonjs
+  if( typeof exports !== "undefined" ){
+    exports.loadCSS = loadCSS;
+  }
+  else {
+    w.loadCSS = loadCSS;
+  }
+}( typeof global !== "undefined" ? global : this ) );</script><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" defer></script><script src="/js/main.js?v=2018.7.9" defer></script><!-- fancybox--><link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" defer></script><!-- busuanzi--><script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script><meta name="generator" content="Hexo 4.2.0"></head><body><section class="profile-close" id="cxo-profile"><div class="profile-avatar"><i class="fa fa-caret-left"></i><img src="https://dss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=1525175323,4282711120&amp;fm=26&amp;gp=0.jpg"></div><!--.profile-saying
+  i.fa.fa-comment
+  .saying--><div class="cxo-profile-inner"><div class="profile-name">行者自远</div><div class="profile-signature">码出行云流水般的感觉</div><div class="friends"><div>FRIENDS</div><span><a href="liujunchi-bot.github.io" target="_black">mygithub</a></span></div><div class="read-progress"></div></div></section><header id="cxo-intro" style="height: 70vh;background-image: url(https://timgsa.baidu.com/timg?image&amp;quality=80&amp;size=b9999_10000&amp;sec=1579025644130&amp;di=91083c502a018151c4baf71913b3c3fd&amp;imgtype=0&amp;src=http%3A%2F%2Fcdn.duitang.com%2Fuploads%2Fitem%2F201303%2F10%2F20130310192322_dCEtP.jpeg);"><nav id="cxo-intro-nav"><section><div class="intro-nav-title"><a href="/">Mr.Liu's Blog</a></div><div class="intro-nav-label-box"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a><a href="/categories/">Categories</a></div><i class="fa fa-bars intro-nav-menu"><div class="intro-nav-drop"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a><a href="/categories/">Categories</a></div></i><div class="clear"></div></section></nav><h1 class="post-title">Linux操作系统入门到实战(一)：第一行代码</h1><div class="post-intros"><div class="post-intro-meta"><span class="post-intro-time"><i class="post-intro-calendar fa fa-edit"></i><span>2020-02-29</span></span><span class="post-intro-tags"><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="Linux"> Linux</a></span></div><div class="post-intro-read"><span> Word count: <span class="post-count">3.5k</span> | Reading time: <span class="post-count">14</span>min</span></div></div></header><article class="cxo-up" id="cxo-content-outer"><section id="cxo-content-inner"><article class="article-entry" id="post"><!-- TOC -->
+
+<ul>
+<li><a href="#准备阶段">准备阶段</a><ul>
+<li><a href="#安装vmware">安装VMware</a></li>
+<li><a href="#在vm中安装ubuntu">在VM中安装Ubuntu</a></li>
+</ul>
+</li>
+<li><a href="#安装必要依赖和配置">安装必要依赖和配置</a><ul>
+<li><a href="#安装vmtools">安装VMtools</a></li>
+<li><a href="#更换国内源">更换国内源</a></li>
+<li><a href="#安装搜狗输入法">安装搜狗输入法</a></li>
+<li><a href="#安装vim依赖">安装vim依赖</a></li>
+<li><a href="#安装gccc语言程序编译器和gc">安装gcc(C语言程序编译器)和g++(c++)</a></li>
+</ul>
+</li>
+<li><a href="#第一行代码">第一行代码</a></li>
+<li><a href="#博主结语">博主结语</a></li>
+</ul>
+<!-- /TOC -->
+
+
+
+<h1 id="准备阶段"><a href="#准备阶段" class="headerlink" title="准备阶段"></a>准备阶段</h1><h2 id="安装VMware"><a href="#安装VMware" class="headerlink" title="安装VMware"></a>安装VMware</h2><p>我们按照的虚拟机一般选择Virtual Box或者VM，博主安装的是VM，都可以的，两种软件都是为虚拟机服务的，只不过VM在我们国内是破解版的，不算是正版吧，而且VM下载的的东西比较多，Virtual box的话下载的东西少，但是够用了，说那么多给出VM的下载地址<a href="https://www.vmware.com/cn/products/workstation-pro/workstation-pro-evaluation.html" target="_blank" rel="noopener">VMware Workstation15</a>,点击即可进入下载界面，里面有windows版本和MAC版本的，看你自己的系统而定。下载完以后就是傻瓜式的安装，一直点击下一步就欧克了。只不过到最后的时候，<strong>需要输入许可证</strong>，大家进去输入许可证就好了，我给出一个最新的许可证，直接用就行了：VG5HH-D6E04-0889Y-QXZET-QGUC8。</p>
+<h2 id="在VM中安装Ubuntu"><a href="#在VM中安装Ubuntu" class="headerlink" title="在VM中安装Ubuntu"></a>在VM中安装Ubuntu</h2><p>1.下载ubuntuLTS镜像，我这提供了最新版本18.04的下载地址，当然大家也可以根据需要下载其它版本的：<a href="https://ubuntu.com/download/desktop" target="_blank" rel="noopener">https://ubuntu.com/download/desktop</a></p>
+<p>2.打开虚拟机，点击创建新的虚拟机。</p>
+<p><img src="/2020/02/29/Linux1/1.png" alt></p>
+<p>3.为了简便，选择典型即可，之后点击下一步</p>
+<p>4.点击安装程序光盘镜像文件，选择你在上面下载的ubuntu镜像文件，选择完以后再点击“稍后安装操作系统”，再点击下一步。</p>
+<p><img src="/2020/02/29/Linux1/2.png" alt></p>
+<p>5.选择Linux，然后版本看自己下载的镜像文件的版本而定，如果你下载的镜像文件是32位的话，版本就选择Ubuntu，如果是64位的话，就选择Ubuntu 64位的。</p>
+<p><img src="/2020/02/29/Linux1/3.png" alt></p>
+<p>6.之后你选择你想要存储的位置，然后定义一下你下载的虚拟机名称</p>
+<p>7.之后进入指定磁盘文件的界面，默认系统的选择即可，直接下一步。</p>
+<p><img src="/2020/02/29/Linux1/4.png" alt></p>
+<p>8.选择自定义硬件。</p>
+<p><img src="/2020/02/29/Linux1/5.png" alt></p>
+<p>9.内存选择2GB，处理器数量1个，每个处理器内核数量为2.</p>
+<p><img src="/2020/02/29/Linux1/6.png" alt></p>
+<p>打印机的话一般不需要，直接点击，选择移除就可以了。</p>
+<p>10.选择“新CD/DVD(SATA)”，点击使用ISO映像文件，选择你之前下载的ubuntu镜像文件即可。</p>
+<p><img src="/2020/02/29/Linux1/7.png" alt></p>
+<p>11.之后选择关闭，然后点击完成就可以了。</p>
+<p><img src="/2020/02/29/Linux1/5.png" alt></p>
+<p>12.之后VM的”我的计算机“下面就会出现你创建的虚拟机的名称，然后点击这个，选择打开虚拟机即可。</p>
+<p>13.之后会进入安装ubuntu的界面，选择你想要的语言版本，点击下载即可。</p>
+<p><img src="/2020/02/29/Linux1/8.png" alt></p>
+<p>之后会进入键盘布局，选择汉语或者英语</p>
+<p>14.进入安装更新界面，按照默认的来就行了，直接点击继续。</p>
+<p><img src="/2020/02/29/Linux1/9.png" alt></p>
+<p>15.之后就是傻瓜式点击继续就可以了，最后点击现在安装。</p>
+<p><img src="/2020/02/29/Linux1/10.png" alt></p>
+<p>16.选择地区，上海或者重庆。</p>
+<p><img src="/2020/02/29/Linux1/11.png" alt></p>
+<p>17.输入你需要的用户名和密码即可。</p>
+<p><img src="/2020/02/29/Linux1/12.png" alt></p>
+<p>18.最后进入了安装界面，耐心等待即可，若干个小时后就会安装成功了。</p>
+<p><img src="/2020/02/29/Linux1/13.png" alt></p>
+<p>安装完以后重启即可。之后会进入一下界面，恭喜你安装成功！！！</p>
+<p><img src="/2020/02/29/Linux1/14.png" alt></p>
+<h1 id="安装必要依赖和配置"><a href="#安装必要依赖和配置" class="headerlink" title="安装必要依赖和配置"></a>安装必要依赖和配置</h1><h2 id="安装VMtools"><a href="#安装VMtools" class="headerlink" title="安装VMtools"></a>安装VMtools</h2><p>为什么要安装VMtools呢？因为这个很方便，第一可以支持虚拟机和本地机之间的复制粘贴，在虚拟机里面的复制内容可以粘贴到本地机上面，很奈斯。然后安装这个以后，本地机还可以和虚拟机之间共享文件。</p>
+<p>1.首先按ctrl+alt+t打开终端。</p>
+<p>2.在VM上选择该虚拟机，并且在VM的菜单上选择虚拟机-&gt;安装VMtools</p>
+<p>3.按理来说，里面虚拟机的界面会弹出一个VMtools的文件：</p>
+<p><img src="/2020/02/29/Linux1/16.png" alt></p>
+<p>如果说没有跳出这个文件，就可以尝试先关闭虚拟机，然后在你安装VMWare的目录下找到linux.iso文件。然后把这个文件复制到你原来挂载的那个iso文件的目录下，然后选择虚拟机，点击编辑虚拟机，在CD/DVD选项中，把挂在的光驱改成linux.iso，然后重启，再选择重新安装VMtools即可以看到跳出的VMtools文件。</p>
+<p><img src="/2020/02/29/Linux1/17.png" alt></p>
+<p><img src="/2020/02/29/Linux1/18.png" alt></p>
+<p>拓展：教你如何随时切换用户模式：</p>
+<p>以root身份登陆终端，如果说你安装虚拟机以后，第一次使用root登陆的话，就必须得创建你的root用户，输入<code>sudo passwd root</code>, 之后会叫你输入密码和确认密码，设置root用户的登陆密码，这个密码是看不见的，所以你输入的时候看见没有一点点的东西很正常，继续输入就行。之后会显示设置成功，再输入<code>su root</code>进入root模式即可，如果说你想切换为原来的普通用户模式，就可以输入<code>su 你自己的用户名</code>.示例如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">liujunchi@ubuntu:~$ sudo passwd root</span><br><span class="line">[sudo] password for liujunchi: </span><br><span class="line">Enter new UNIX password: </span><br><span class="line">Retype new UNIX password: </span><br><span class="line">passwd: password updated successfully</span><br><span class="line">liujunchi@ubuntu:~$ su root</span><br><span class="line">Password: </span><br><span class="line">root@ubuntu:&#x2F;home&#x2F;liujunchi# su liujunchi</span><br><span class="line">liujunchi@ubuntu:~$ </span><br><span class="line">这个只是演示，下一步的时候你还是得进入root模式</span><br></pre></td></tr></table></figure>
+
+<p>4.点击跳出来的VMtools文件，选择里面的VMtools巴拉巴拉什么.gz文件，复制一下，然后在home文件夹里面建立一个VMtools文件，复制到这个文件中。之后在当前文件夹下右键点击，选择在终端中打开。解压这个什么gz文件，之后会在目录下看到一个vmware-tools-distrib文件，cd到这个文件夹，ls查看文件，发现有一个vmware-install.pl文件，之后安装VMtools工具即可。</p>
+<p>输入以下示例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">liujunchi@ubuntu:~&#x2F;VMtools$ ls</span><br><span class="line">VMwareTools-10.2.5-8068393.tar.gz</span><br><span class="line">liujunchi@ubuntu:~&#x2F;VMtools$ tar zpxf VMwareTools-10.2.5-8068393.tar.gz</span><br><span class="line">liujunchi@ubuntu:~&#x2F;VMtools$ ls</span><br><span class="line">VMwareTools-10.2.5-8068393.tar.gz  vmware-tools-distrib</span><br><span class="line">liujunchi@ubuntu:~&#x2F;VMtools$ cd vmware-tools-distrib</span><br><span class="line">liujunchi@ubuntu:~&#x2F;VMtools&#x2F;vmware-tools-distrib$ ls</span><br><span class="line">bin  caf  doc  etc  FILES  INSTALL  installer  lib  vgauth  vmware-install.pl</span><br><span class="line">liujunchi@ubuntu:~&#x2F;VMtools&#x2F;vmware-tools-distrib$ sudo .&#x2F;vmware-install.pl</span><br></pre></td></tr></table></figure>
+
+
+
+<p>输入完以后，要进入root权限，然后输入密码，后面会出现：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">open-vm-tools packages are available from the OS vendor and VMware recommends </span><br><span class="line">using open-vm-tools packages. See http:&#x2F;&#x2F;kb.vmware.com&#x2F;kb&#x2F;2073803 for more </span><br><span class="line">information.</span><br><span class="line">Do you still want to proceed with this installation? [yes] y</span><br><span class="line"></span><br><span class="line">INPUT: [y]</span><br><span class="line"></span><br><span class="line">A previous installation of VMware Tools has been detected.</span><br><span class="line"></span><br><span class="line">The previous installation was made by the tar installer (version 4).</span><br><span class="line">。。。。。。下面还有</span><br></pre></td></tr></table></figure>
+
+<p>之后就是要输入yes/no的就输入yes，不需要的就一直enter下去，然后就可以安装成功了，安装成功以后会出现：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">To enable advanced X features (e.g., guest resolution fit, drag and drop, and </span><br><span class="line">file and text copy&#x2F;paste), you will need to do one (or more) of the following:</span><br><span class="line">1. Manually start &#x2F;usr&#x2F;bin&#x2F;vmware-user</span><br><span class="line">2. Log out and log back into your desktop session</span><br><span class="line">3. Restart your X session.</span><br><span class="line"></span><br><span class="line">Enjoy,</span><br><span class="line"></span><br><span class="line">--the VMware team</span><br><span class="line"></span><br><span class="line">Found VMware Tools CDROM mounted at &#x2F;media&#x2F;liujunchi&#x2F;VMware Tools. Ejecting </span><br><span class="line">device &#x2F;dev&#x2F;sr0 ...</span><br></pre></td></tr></table></figure>
+
+<p>安装成功！！！</p>
+<h2 id="更换国内源"><a href="#更换国内源" class="headerlink" title="更换国内源"></a>更换国内源</h2><p>你会发现在ubuntu系统中下载东西都特别慢，那是因为它默认的下载源是国外的服务器，若要提高速度，则必须得更换为我们国内的下载源：</p>
+<p>1.首先备份当前的源（要输入你设置的root的密码）：<code>sudo cp /etc/apt/sources.list /etc/apt/sources_init.list</code></p>
+<p>2.更换阿里云的源,输入<code>sudo gedit /etc/apt/sources.list</code>打开源配置文件，进入以后，全部删了里面的内容，然后复制下面阿里云源的内容：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">deb http:&#x2F;&#x2F;mirrors.aliyun.com&#x2F;ubuntu&#x2F; xenial main</span><br><span class="line">deb-src http:&#x2F;&#x2F;mirrors.aliyun.com&#x2F;ubuntu&#x2F; xenial main</span><br><span class="line"></span><br><span class="line">deb http:&#x2F;&#x2F;mirrors.aliyun.com&#x2F;ubuntu&#x2F; xenial-updates main</span><br><span class="line">deb-src http:&#x2F;&#x2F;mirrors.aliyun.com&#x2F;ubuntu&#x2F; xenial-updates main</span><br><span class="line"></span><br><span class="line">deb http:&#x2F;&#x2F;mirrors.aliyun.com&#x2F;ubuntu&#x2F; xenial universe</span><br><span class="line">deb-src http:&#x2F;&#x2F;mirrors.aliyun.com&#x2F;ubuntu&#x2F; xenial universe</span><br><span class="line">deb http:&#x2F;&#x2F;mirrors.aliyun.com&#x2F;ubuntu&#x2F; xenial-updates universe</span><br><span class="line">deb-src http:&#x2F;&#x2F;mirrors.aliyun.com&#x2F;ubuntu&#x2F; xenial-updates universe</span><br><span class="line"></span><br><span class="line">deb http:&#x2F;&#x2F;mirrors.aliyun.com&#x2F;ubuntu&#x2F; xenial-security main</span><br><span class="line">deb-src http:&#x2F;&#x2F;mirrors.aliyun.com&#x2F;ubuntu&#x2F; xenial-security main</span><br><span class="line">deb http:&#x2F;&#x2F;mirrors.aliyun.com&#x2F;ubuntu&#x2F; xenial-security universe</span><br><span class="line">deb-src http:&#x2F;&#x2F;mirrors.aliyun.com&#x2F;ubuntu&#x2F; xenial-security universe</span><br></pre></td></tr></table></figure>
+
+
+
+<p>换源以后，保存文件内容，然后退出。</p>
+<p>3.输入命令更新源：<code>sudo apt-get update</code></p>
+<p>4.复损坏的软件包，尝试卸载出错的包，重新安装正确版本的:<code>sudo apt-get -f install</code>以后你安装什么东西出了问题，都可以输入这个命令进行修复。</p>
+<p>5.更新软件：<code>sudo apt-get upgrade</code></p>
+<p>更新源完毕！！！！</p>
+<h2 id="安装搜狗输入法"><a href="#安装搜狗输入法" class="headerlink" title="安装搜狗输入法"></a>安装搜狗输入法</h2><p>1.首先进入以下网站下载Linux版的搜狗输入法：<a href="https://pinyin.sogou.com/linux/。进入网站后可以在左上角看到下载的选项以及当前搜狗支持的Ubuntu版本，里面有64和32位的，看你安装的虚拟机什么版本，下载什么，一般是下载文档存储。" target="_blank" rel="noopener">https://pinyin.sogou.com/linux/。进入网站后可以在左上角看到下载的选项以及当前搜狗支持的Ubuntu版本，里面有64和32位的，看你安装的虚拟机什么版本，下载什么，一般是下载文档存储。</a></p>
+<p>2.下载的包默认存储在Downloads文档里面，转到Downloads文档查看：<code>cd Downloads/</code>,之后ls查看文件可以发现搜狗的deb包：<code>sogoupinyin_2.3.1.0112_amd64.deb</code></p>
+<p>然后利用<code>sudo dpkg -i sogoupinyin_2.3.1.0112_amd64.deb</code>安装搜狗输入法即可c</p>
+<p>3.发现会报错，因为缺少fcitx包，因此需要安装</p>
+<ul>
+<li><p>添加fcitx源：<code>sudo add-apt-repository ppa:fcitx-team/nightly</code></p>
+</li>
+<li><p>更新源列表：<code>sudo apt-get update</code></p>
+</li>
+<li><p>下载安装fcitx包：<code>sudo apt-get install fcitx</code></p>
+</li>
+<li><p>如果按照还报错，则可以输入：<code>sudo apt-get install fcitx</code>下载需要并且缺少的依赖包</p>
+</li>
+<li><p>安装其它依赖包：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ sudo apt-get install fcitx-table-all</span><br><span class="line">$ sudo apt-get install fcitx-config-gtk</span><br><span class="line">$ sudo apt-get install im-swit</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>安装fcitx成功以后，就进入语言设置中将keyboard input类型由原来的ibus改为fcitx，如下图所示。</p>
+</li>
+</ul>
+<p><img src="/2020/02/29/Linux1/20.png" alt></p>
+<ul>
+<li>fcitx安装成功后就可以直接利用上面的dkpg指令安装搜狗的deb包，安装结束后还不能直接使用，需要重新启动Ubuntu才能调出搜狗输入法。</li>
+<li>重新启动以后，按ctrl+alt+t打开终端界面，输入<code>fcitx-config-gtk3</code>,之后会出现一个界面：</li>
+</ul>
+<p><img src="/2020/02/29/Linux1/21.png" alt></p>
+<p>点击‘+’</p>
+<p>取消”only show current language“，然后输入pingyin，就会看到一个Sougou pingtin，选择这个，并且点击ok即可，之后按shift，就会显示出搜狗拼音的图标了，然后可以正常输入中文和英文。</p>
+<p><img src="/2020/02/29/Linux1/23.png" alt></p>
+<p>搜狗输入法安装完毕！！！</p>
+<h2 id="安装vim依赖"><a href="#安装vim依赖" class="headerlink" title="安装vim依赖"></a>安装vim依赖</h2><p>1.安装vim：<code>sudo apt-get install vim</code></p>
+<p>如果出现以下问题：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">Reading package lists... Done</span><br><span class="line">Building dependency tree       </span><br><span class="line">Reading state information... Done</span><br><span class="line">Some packages could not be installed. This may mean that you have</span><br><span class="line">requested an impossible situation or if you are using the unstable</span><br><span class="line">distribution that some required packages have not yet been created</span><br><span class="line">or been moved out of Incoming.</span><br><span class="line">The following information may help to resolve the situation:</span><br><span class="line"></span><br><span class="line">The following packages have unmet dependencies:</span><br><span class="line"> vim : Depends: vim-common (&#x3D; 2:7.4.1689-3ubuntu1.3) but 2:8.0.1453-1ubuntu1.1 is to be installed</span><br><span class="line">E: Unable to correct problems, you have held broken packages.</span><br></pre></td></tr></table></figure>
+
+<p>则说明安装有点问题。</p>
+<p>2.检测vim安装是否成功：<code>vim -v</code></p>
+<p>结果出现了：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">Command &#39;vim&#39; not found, but can be installed with:</span><br><span class="line"></span><br><span class="line">sudo apt install vim       </span><br><span class="line">sudo apt install vim-gtk3  </span><br><span class="line">sudo apt install vim-tiny  </span><br><span class="line">sudo apt install neovim    </span><br><span class="line">sudo apt install vim-athena</span><br><span class="line">sudo apt install vim-gtk   </span><br><span class="line">sudo apt install vim-nox</span><br></pre></td></tr></table></figure>
+
+<p>3.解决问题，卸载原有的vim-common：<code>sudo apt-get remove vim-common</code></p>
+<p>4.卸载成功后，重新安装vim即可成功：<code>sudo apt-get install vim</code>.之后会询问yes/no，选择yes即可。</p>
+<p>5.输入<code>vim -v</code>检查是否成功，出现下面示例就成功了：</p>
+<p><img src="/2020/02/29/Linux1/19.png" alt></p>
+<p>vim安装成功！！！</p>
+<h2 id="安装gcc-C语言程序编译器-和g-c"><a href="#安装gcc-C语言程序编译器-和g-c" class="headerlink" title="安装gcc(C语言程序编译器)和g++(c++)"></a>安装gcc(C语言程序编译器)和g++(c++)</h2><p>1.输入：<code>sudo apt-get install build-essential</code></p>
+<p>2.安装gcc：<code>sudo apt-get install gcc</code></p>
+<p>3.安装g++：<code>sudo apt-get install g++</code>.发现输入之后会出现：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">Reading package lists... Done</span><br><span class="line">Building dependency tree       </span><br><span class="line">Reading state information... Done</span><br><span class="line">Some packages could not be installed. This may mean that you have</span><br><span class="line">requested an impossible situation or if you are using the unstable</span><br><span class="line">distribution that some required packages have not yet been created</span><br><span class="line">or been moved out of Incoming.</span><br><span class="line">The following information may help to resolve the situation:</span><br><span class="line"></span><br><span class="line">The following packages have unmet dependencies:</span><br><span class="line"> g++ : Depends: g++-5 (&gt;&#x3D; 5.3.1-3~) but it is not going to be installed</span><br><span class="line">E: Unable to correct problems, you have held broken packages.</span><br></pre></td></tr></table></figure>
+
+<p>发现是更新的源有问题，我们之前更新的是阿里云的源，没错，但是我们的Ubuntu(我自己的)是18.04版本的，而我查看了一下，自己在上面更新的源是16.04版本的，因此得换成对应版本了，这个bug给力，查了我好久，进入网址<a href="http://mirrors.aliyun.com" target="_blank" rel="noopener">阿里云源</a>,进入ubuntu选项的界面，找到对应版本的源，复制粘贴，按照上面讲的重新更新一下就行，把sources.list文件里面改成你复制的源即可。</p>
+<p>4.之后再更新源：<code>sudo apt-get update</code>,然后更新软件<code>sudo apt-get upgrade</code>。最后输入上面的<code>sudo apt-get install g++</code>即可成功安装。</p>
+<p>5.检测gcc和g++的安装：gcc -v和g++ -v，吐过出现对应版本，则恭喜你安装成功。</p>
+<h1 id="第一行代码"><a href="#第一行代码" class="headerlink" title="第一行代码"></a>第一行代码</h1><p>接下来我们在虚拟机Ubuntu系统里编写我们的第一行C语言代码吧。</p>
+<p>1.在对应的文件夹里(可以cd到某个你建立的文件夹)，我是直接在总文件夹里面创建了一个c文件:<code>touch hello.c</code></p>
+<p>然后咱们就可以在对应的文件夹里面看到这样一个hello.c文件，点击进去进行编辑，敲完代码进行保存即可：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">#include&lt;stdio.h&gt;</span><br><span class="line">int main()&#123;</span><br><span class="line"></span><br><span class="line">   printf(&quot;hello world!\n&quot;);</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>2.在这个c文件对应的目录下打开终端，输入<code>gcc hello.c -o hello</code>,对这个文件进行编译，编译成hello文件，在对应文件夹里也可以看见。然后输入<code>./hello</code>就可以看到对应的运行结果。</p>
+<p><img src="/2020/02/29/Linux1/24.png" alt></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">liujunchi@ubuntu:~$ touch hello.c</span><br><span class="line">liujunchi@ubuntu:~$ gcc hello.c -o hello</span><br><span class="line">liujunchi@ubuntu:~$ .&#x2F;hello</span><br><span class="line">hello world!</span><br><span class="line">liujunchi@ubuntu:~$</span><br></pre></td></tr></table></figure>
+
+<h1 id="博主结语"><a href="#博主结语" class="headerlink" title="博主结语"></a>博主结语</h1><p>现在，你可以在linux系统的ubuntu下运行你的第一行C语言代码，很有成就感吧，这只是刚刚开始，我们只是安装了部分的依赖，以后使用Linux的过程中会用到越来越多的东西，会安装越来越多的依赖，我们后续的使用过程会得去熟悉各种文件操作指令，shell编程等等，这篇文章只是初步介绍，博主会陆续更新Linux操作系统的文章，欢迎大家关注！！！谢谢观看！！</p>
+</article><!-- lincense--><div class="license-wrapper"><p> <span>Author:  </span><a href="http://liujunchi-bot.github.io">John Doe</a></p><p> <span>Link:  </span><a href="http://liujunchi-bot.github.io/2020/02/29/Linux1/">http://liujunchi-bot.github.io/2020/02/29/Linux1/</a></p><p> <span>Copyright:  </span><span>All articles in this blog are licensed under <a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-nd/3.0" target="_blank">CC BY-NC-SA 3.0</a> unless stating additionally.</span></p></div><div class="post-paginator"><a class="nextSlogan" href="/2020/02/25/jisuanjiwangluo/" title="驰哥趣谈计算机网络"><span>NextPost ></span><br><span class="nextTitle">驰哥趣谈计算机网络</span></a><div class="clear"></div></div><div id="comment"><div id="container"></div><link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css"><script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script><script>var gitment = new Gitment({
+  //- id: 'Linux操作系统入门到实战(一)：第一行代码',
+  //- owner: 'liujunchi-bot',
+  //- repo: 'Blog-Comment',
+  //- oauth: {
+  //-   client_id: 'fcc11412ea5eb9310de3',
+  //-   client_secret: 'fb83a32085e0e8570fd37c38d4909a2436776fde',
+  //- },
+  id: '{% raw %}{{ page.date }}{% endraw %}',
+  owner: 'liujunchi-bot',
+  repo: 'Blog-Comment',
+  oauth: {
+    client_id: 'fcc11412ea5eb9310de3',
+    client_secret: 'fb83a32085e0e8570fd37c38d4909a2436776fde',
+  },
+})
+gitment.render('container')</script></div></section></article><footer id="cxo-footer-outer"><div id="cxo-footer-inner"><p class="footer-container"><span>Site by </span><a href="http://hexo.io" target="_blank" rel="noopener"><span>Hexo</span></a><span> | theme </span><a href="https://github.com/Longlongyu/hexo-theme-Cxo" target="_blank" rel="noopener"><span>Cxo</span></a></p><i class="fa fa-user"> </i><span id="busuanzi_value_site_uv"></span><span> | </span><i class="fa fa-eye"> </i><span id="busuanzi_value_site_pv"></span></div></footer><!-- catelog--><div class="toc-wrapper" style="top: 70vh;"><div class="toc-catalog"><i class="fa fa-list"> </i><span>CATALOG</span></div><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#准备阶段"><span class="toc-number">1.</span> <span class="toc-text">准备阶段</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#安装VMware"><span class="toc-number">1.1.</span> <span class="toc-text">安装VMware</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#在VM中安装Ubuntu"><span class="toc-number">1.2.</span> <span class="toc-text">在VM中安装Ubuntu</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#安装必要依赖和配置"><span class="toc-number">2.</span> <span class="toc-text">安装必要依赖和配置</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#安装VMtools"><span class="toc-number">2.1.</span> <span class="toc-text">安装VMtools</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#更换国内源"><span class="toc-number">2.2.</span> <span class="toc-text">更换国内源</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#安装搜狗输入法"><span class="toc-number">2.3.</span> <span class="toc-text">安装搜狗输入法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#安装vim依赖"><span class="toc-number">2.4.</span> <span class="toc-text">安装vim依赖</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#安装gcc-C语言程序编译器-和g-c"><span class="toc-number">2.5.</span> <span class="toc-text">安装gcc(C语言程序编译器)和g++(c++)</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#第一行代码"><span class="toc-number">3.</span> <span class="toc-text">第一行代码</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#博主结语"><span class="toc-number">4.</span> <span class="toc-text">博主结语</span></a></li></ol></div><!-- top--><i class="fa fa-arrow-up close" id="go-up" aria-hidden="true"></i></body></html>
