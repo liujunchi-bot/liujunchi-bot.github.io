@@ -1,0 +1,621 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"><meta name="author" content="John Doe"><meta name="renderer" content="webkit"><meta name="copyright" content="John Doe"><meta name="keywords" content="Hexo"><meta name="description" content=""><meta name="Cache-Control" content="no-cache"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><title>Linux操作系统入门到实战(二)：探秘文件 · Mr.Liu's Blog</title><link rel="stylesheet" href="/css/style.css?v=2018.7.9"><link rel="stylesheet" href="/css/animation.css?v=2018.7.9"><link rel="icon" href="/img/assets/favicon.ico"><link rel="stylesheet" href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css?version=1.5.6"><!-- scripts--><script>(function( w ){
+  "use strict";
+  // rel=preload support test
+  if( !w.loadCSS ){
+    w.loadCSS = function(){};
+  }
+  // define on the loadCSS obj
+  var rp = loadCSS.relpreload = {};
+  // rel=preload feature support test
+  // runs once and returns a function for compat purposes
+  rp.support = (function(){
+    var ret;
+    try {
+      ret = w.document.createElement( "link" ).relList.supports( "preload" );
+    } catch (e) {
+      ret = false;
+    }
+    return function(){
+      return ret;
+    };
+  })();
+
+  // if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+  // then change that media back to its intended value on load
+  rp.bindMediaToggle = function( link ){
+    // remember existing media attr for ultimate state, or default to 'all'
+    var finalMedia = link.media || "all";
+
+    function enableStylesheet(){
+      link.media = finalMedia;
+    }
+
+    // bind load handlers to enable media
+    if( link.addEventListener ){
+      link.addEventListener( "load", enableStylesheet );
+    } else if( link.attachEvent ){
+      link.attachEvent( "onload", enableStylesheet );
+    }
+
+    // Set rel and non-applicable media type to start an async request
+    // note: timeout allows this to happen async to let rendering continue in IE
+    setTimeout(function(){
+      link.rel = "stylesheet";
+      link.media = "only x";
+    });
+    // also enable media after 3 seconds,
+    // which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+    setTimeout( enableStylesheet, 3000 );
+  };
+
+  // loop through link elements in DOM
+  rp.poly = function(){
+    // double check this to prevent external calls from running
+    if( rp.support() ){
+      return;
+    }
+    var links = w.document.getElementsByTagName( "link" );
+    for( var i = 0; i < links.length; i++ ){
+      var link = links[ i ];
+      // qualify links to those with rel=preload and as=style attrs
+      if( link.rel === "preload" && link.getAttribute( "as" ) === "style" && !link.getAttribute( "data-loadcss" ) ){
+        // prevent rerunning on link
+        link.setAttribute( "data-loadcss", true );
+        // bind listeners to toggle media back
+        rp.bindMediaToggle( link );
+      }
+    }
+  };
+
+  // if unsupported, run the polyfill
+  if( !rp.support() ){
+    // run once at least
+    rp.poly();
+
+    // rerun poly on an interval until onload
+    var run = w.setInterval( rp.poly, 500 );
+    if( w.addEventListener ){
+      w.addEventListener( "load", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    } else if( w.attachEvent ){
+      w.attachEvent( "onload", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    }
+  }
+
+
+  // commonjs
+  if( typeof exports !== "undefined" ){
+    exports.loadCSS = loadCSS;
+  }
+  else {
+    w.loadCSS = loadCSS;
+  }
+}( typeof global !== "undefined" ? global : this ) );</script><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" defer></script><script src="/js/main.js?v=2018.7.9" defer></script><!-- fancybox--><link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" defer></script><!-- busuanzi--><script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script><meta name="generator" content="Hexo 4.2.0"></head><body><section class="profile-close" id="cxo-profile"><div class="profile-avatar"><i class="fa fa-caret-left"></i><img src="https://dss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=1525175323,4282711120&amp;fm=26&amp;gp=0.jpg"></div><!--.profile-saying
+  i.fa.fa-comment
+  .saying--><div class="cxo-profile-inner"><div class="profile-name">行者自远</div><div class="profile-signature">码出行云流水般的感觉</div><div class="friends"><div>FRIENDS</div><span><a href="liujunchi-bot.github.io" target="_black">mygithub</a></span></div><div class="read-progress"></div></div></section><header id="cxo-intro" style="height: 70vh;background-image: url(https://timgsa.baidu.com/timg?image&amp;quality=80&amp;size=b9999_10000&amp;sec=1579025644130&amp;di=91083c502a018151c4baf71913b3c3fd&amp;imgtype=0&amp;src=http%3A%2F%2Fcdn.duitang.com%2Fuploads%2Fitem%2F201303%2F10%2F20130310192322_dCEtP.jpeg);"><nav id="cxo-intro-nav"><section><div class="intro-nav-title"><a href="/">Mr.Liu's Blog</a></div><div class="intro-nav-label-box"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a><a href="/categories/">Categories</a></div><i class="fa fa-bars intro-nav-menu"><div class="intro-nav-drop"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a><a href="/categories/">Categories</a></div></i><div class="clear"></div></section></nav><h1 class="post-title">Linux操作系统入门到实战(二)：探秘文件</h1><div class="post-intros"><div class="post-intro-meta"><span class="post-intro-time"><i class="post-intro-calendar fa fa-edit"></i><span>2020-03-04</span></span><span class="post-intro-tags"><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="Linux"> Linux</a></span></div><div class="post-intro-read"><span> Word count: <span class="post-count">12.9k</span> | Reading time: <span class="post-count">51</span>min</span></div></div></header><article class="cxo-up" id="cxo-content-outer"><section id="cxo-content-inner"><article class="article-entry" id="post"><!-- TOC -->
+
+<ul>
+<li><a href="#从终端开始说起">从终端开始说起</a><ul>
+<li><a href="#概述">概述</a></li>
+<li><a href="#为什么要终端">为什么要终端</a></li>
+<li><a href="#两种终端">两种终端</a></li>
+<li><a href="#图形终端的两种模式">图形终端的两种模式</a></li>
+</ul>
+</li>
+<li><a href="#基本的文件操作命令">基本的文件操作命令</a><ul>
+<li><a href="#命令参数">命令参数</a></li>
+<li><a href="#查找命令和历史记录">查找命令和历史记录</a></li>
+<li><a href="#文件的组织">文件的组织</a></li>
+<li><a href="#目录命令">目录命令</a></li>
+<li><a href="#浏览与创建文件">浏览与创建文件</a></li>
+<li><a href="#复制删除移动链接文件">复制删除移动链接文件</a></li>
+<li><a href="#探秘用户和群组">探秘用户和群组</a></li>
+<li><a href="#文件权限管理">文件权限管理</a></li>
+<li><a href="#nano编辑器">nano编辑器</a></li>
+<li><a href="#学会阅读手册">学会阅读手册</a></li>
+<li><a href="#查找文件">查找文件</a></li>
+</ul>
+</li>
+<li><a href="#博主寄语">博主寄语</a></li>
+</ul>
+<!-- /TOC -->
+<h1 id="从终端开始说起"><a href="#从终端开始说起" class="headerlink" title="从终端开始说起"></a>从终端开始说起</h1><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>Linux系统和Windows系统最大的不同之处是前者大部分操作都是在shell终端上操作，后者大部分都是在图形界面的操作。在linux里面可谓是终端的世界。上手linux操作系统的第一步就是从终端开始，终端的世界太广阔了，博主也只是简单了解了，但是几乎没有一个人可以说自己把终端完全学会了，因为终端也是不断更新的，命令也在不断增加，总有新的东西等待我们去发掘。</p>
+<h2 id="为什么要终端"><a href="#为什么要终端" class="headerlink" title="为什么要终端"></a>为什么要终端</h2><p>或许有的人会问，为什么要有终端这东西，为什么Linux操作系统里面会是终端的世界，用图形界面不香吗？现在都什么时代了，还用终端这种老东西，你看看图形界面多好看，多方便。用终端不会是为了装技术高超啊？</p>
+<ul>
+<li>为什么要终端？我只能说，终端这东西几十年前就已经发明出来了，当时图形界面还没有出来，终端界面用的过程其实也很方便，沿用至今。但是在技术不断更新迭代的过程中，为什么终端没有成为历史的尘埃呢？的确，学习图形界面的使用会比终端的使用要那么有趣一点，然后也简便易学一点，但是真正学会了终端操作，其实可以做到比图形界面的操作更加方便，更加快。而且有的操作是必须在终端上进行的，图形界面无法做到或者说有的操作在终端上进行更加方便。比如说查看系统是否有Java环境，我们不需要一一去查看那个目录文件里面是否有JDK，只有在终端中输入Java就行了，很快。而且在Linux里面，很多安装下载任务也是在终端上可以运行的，看起来很舒服，几行命令打天下。</li>
+<li>很多时候终端命令更加简洁，节省时间</li>
+</ul>
+<p>所有，好好学会如何使用Linux操作系统里面的终端吧！！！学完就离坐着奔驰，骑着宝马，迎娶白富美的目标更进一步了(嘿嘿，开玩笑，活跃下气氛)</p>
+<h2 id="两种终端"><a href="#两种终端" class="headerlink" title="两种终端"></a>两种终端</h2><p>1.真正的终端：真正的终端就是真的是所有操作只能够在终端上进行，没有任何图形操作，系统所有操作都是在这个真正的终端进行的，此时整个系统就是一个黑黑的屏幕，只有字符。如何进入呢？</p>
+<p>Ubuntu 18.04 及以上版本中，登录 的这些终端的快捷键：</p>
+<ul>
+<li>Ctrl + Alt + F1 : 回到图形界面（感谢上帝~）</li>
+<li>Ctrl + Alt + F2 : terminal 2 (tty2)</li>
+<li>Ctrl + Alt + F3 : terminal 3 (tty3)</li>
+<li>Ctrl + Alt + F4 : terminal 4 (tty4)</li>
+<li>Ctrl + Alt + F5 : terminal 5 (tty5)</li>
+<li>Ctrl + Alt + F6 : terminal 6 (tty6)</li>
+</ul>
+<p>先按上面的快捷键进入，然后这个黑不拉几的界面就会叫你输入你的用户名和密码，输入就可以进入真正的终端了，这个东西可以说是紧急预案措施，系统遇到问题的时候，可以在这个上面解决</p>
+<p>比如说界面如下：</p>
+<p><img src="/2020/03/04/Linux2/1.png" alt="真正的终端"></p>
+<p>2.图像界面终端：说到图形终端，那可真的很人性化，不再是那个黑不拉几又难看的界面了，开始变得好看，使用图形终端的时候，还可以使用图形操作界面，各种软件，在这里面还可以使用鼠标进行复制粘贴，就很舒服。所以一般都是使用图形终端，不到万不得已才会使用真正的黑不拉几的终端。打开这个漂亮的终端可以按快捷键：ctrl+alt+t，也可以直接搜索terminal点击进入。以下就是它了：</p>
+<p><img src="/2020/03/04/Linux2/2.png" alt="图形终端"></p>
+<h2 id="图形终端的两种模式"><a href="#图形终端的两种模式" class="headerlink" title="图形终端的两种模式"></a>图形终端的两种模式</h2><p>1.普通用户模式：我们一进入图形终端的时候，看到的就是普通用户模式，它能够干的事情有限，一般是出现：<code>liujunchi@ubuntu:~$</code>.</p>
+<p>2.超级用户模式(root模式)：这个就是相当于管理员模式，基本上什么操作都可以，拥有更多的权限，输入命令：<code>sudo su</code>,然后在输入你的登录密码就可以进入超级管理员模式了，出现的是这个：<code>root@ubuntu:/home/liujunchi#</code></p>
+<p>当你想要退出超级管理模式的时候，可以按快捷键：ctrl+D，就可以退出到普通用户模式了。</p>
+<h1 id="基本的文件操作命令"><a href="#基本的文件操作命令" class="headerlink" title="基本的文件操作命令"></a>基本的文件操作命令</h1><h2 id="命令参数"><a href="#命令参数" class="headerlink" title="命令参数"></a>命令参数</h2><p>我们有很多操作命令都需要使用到命令参数，告诉这个指令他应该干什么，就比如说查看文件的命令，输入参数会告诉这个命令查看文件的什么，比如说字数，行数，字节等等。格式为：command parameters.前者为命令，后者为参数。</p>
+<p>参数里可以包含多个参数，由空格隔开，也可以包含数字、字母等等。可以说，参数没有固定的格式，但是一般来说还是遵循一定规范的。</p>
+<ul>
+<li>短参数：这个一般都是一个短横线+一个字母，比如说：<code>command -p</code>,也可以一次性加很多个短参数：<code>command -p -a -T -c</code>,当然上述的多个短参数可以合并在一起：<code>command -paTc</code>.</li>
+<li>长参数：长参数是两根短横线+一个比较长的单词参数：<code>command --parameter</code>,当然也可以接多个长参数，就像上面的短参数一样，但是这个不能合并。短参数和长参数可以一起使用：<code>command -paTc --parameter1 --parameter2</code>.</li>
+</ul>
+<h2 id="查找命令和历史记录"><a href="#查找命令和历史记录" class="headerlink" title="查找命令和历史记录"></a>查找命令和历史记录</h2><p>1.Tab键的妙用：它可以快速提示命令，文件名和路径，如果说你输入一个命令到一般，按下Tab键，如果说你输入的这些字符是某个命令或者文件，路径独有的，那么就直接会补全，如果说不是独一无二，有多个就会直接打印出相关的命令，我们可以查找。就比如说我在终端里面输入da，我们按下Tab键就会输出date dash(这两个相关命令)：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">liujunchi@ubuntu:~$ da</span><br><span class="line">dash  date  </span><br><span class="line">但是如果输入dat，那么就是date独一无二的字符，按下Tab直接会补全为date。</span><br></pre></td></tr></table></figure>
+
+<p>2.命令历史记录：</p>
+<ul>
+<li>我们按向上键和向下键时，终端里面会自动出现我们之前输入的一个命令，和相对于这个命令之后输入的命令，就比如说，我在终端中总共输入了：命令1，命令2，命令3这三个命令(按照时间顺序)，那么在输入完命令3的时候，我们按向上键，这个命令就会自动变成命令2，再按向下命令又会变成命令3.</li>
+<li>我们也可以按下某些快捷键：ctrl+R,这个可以查看我们之前输入过的命令，比如说，我按下这个快捷键以后，会出现：(reverse-i-search)’: ,然后我输入da，这个就会自动补全为：<code>(reverse-i-search)da&#39;: date</code>， 因为date是我之前输入过的命令。按下enter就会运行这个命令</li>
+<li>输入命令history，就会出现自从我们安装这个系统以来我们输入过的命令，以下是我自己的：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">371  cd</span><br><span class="line">  372  cd redirect</span><br><span class="line">  373  cut -d , -f 1 notes.csv &gt; studends.txt</span><br><span class="line">  374  ls</span><br><span class="line">  375  cat studends.csv</span><br><span class="line">  376  cat studends.txt</span><br><span class="line">  377  cut -d , -f 1 notes.csv &gt; &#x2F;dev&#x2F;null</span><br><span class="line">  378  cut -d , -f 2 notes.csv &gt;&gt; studends.txt</span><br><span class="line">  379  cat studends.txt</span><br><span class="line">  380  cat not_exist.csv &gt;result.txt 2&gt; error.log</span><br><span class="line">  381  cat result.txt</span><br><span class="line">  382  cat error.log</span><br><span class="line">  383  cat not_exist.csv &gt; result.txt 2&gt;&amp;1</span><br><span class="line">  384  cat result.txt</span><br><span class="line">  385  cat not_exist.csv &gt;&gt; result.txt 2&gt;&amp;1</span><br><span class="line">  386  cat result.txt</span><br><span class="line">  387  sudo su</span><br><span class="line">  388  date </span><br><span class="line">  389  dash</span><br><span class="line">  390  date</span><br><span class="line">  391  history</span><br></pre></td></tr></table></figure>
+
+<p>像我自从安装以来就输入了391个命令，因此全部打印出来了。</p>
+<h2 id="文件的组织"><a href="#文件的组织" class="headerlink" title="文件的组织"></a>文件的组织</h2><p>1.Linux系统的目录结构：普通用户的根目录为~目录，root用户的根目录为home目录，在Linux系统(虚拟机)里面，只有一个根目录，不像Windows系统有几个根目录，比如说C盘，D盘等等。</p>
+<p>以下是Linux的目录结构：</p>
+<blockquote>
+<ul>
+<li>bin：英语 binary 的缩写，表示“二进制文件”（我们知道可执行文件是二进制的）。包含了会被所有用户使用的可执行程序；</li>
+<li>boot：英语 boot 表示“启动”，包含与 Linux 启动密切相关的文件；</li>
+<li>dev：英语 device 的缩写，表示“设备”，包含外设。它里面的子目录，每一个对应一个外设。比如代表我们的光盘驱动器的文件就会出现在这个目录下面；</li>
+<li>etc：etc 有点不能顾名思义了。因为 etc 是法语 et cetera 的缩写，翻成英语就是“and so on”，表示“…等等”，包含系统的配置文件。至于为什么在 /etc 下面存放配置文件， 按照原始的 Unix 说法（Linux 文件结构参考 Unix 的教学实现 MINIX），这下面放的都是一堆零零碎碎的东西， 就叫 etc 好了。哈哈 ，这其实是个历史遗留；</li>
+<li>home：英语 home 表示“家”，用户的私人目录。之前我们提过一些，在这个目录中，我们放置私人的文件，有点类似 Windows 中的 Documents 这个文件夹，也叫“我的文档”。Linux 中的每个用户（除了大管家用户，也就是超级用户 root 外。root 因为太厉害，拥有所有权限，所以比较“任性”，跟普通用户不住在一起）都在 home 目录下有自己的一个私人目录。比如我的用户名是 oscar，那么我的私人目录就是 /home/oscar；如果另一个用户叫 john，那么他的私人目录就是 /home/john；</li>
+<li>lib：英语 library 的缩写，表示“库”，包含被程序所调用的库文件。例如 .so 结尾的文件，在 Windows 下这样的库文件是以 .dll 结尾的；</li>
+<li>media：英语 media 表示“媒体”。当一个可移动的外设（比如 USB 盘、SD 卡、DVD、光盘等等）插入电脑时，Linux 就可以让我们通过 media 的子目录来访问这些外设中的内容。</li>
+<li>mnt：英语 mount 的缩写，表示“挂载”。有点类似 media，但一般用于临时挂载一些装置；</li>
+<li>opt：英语 optional application software package 的缩写，表示“可选的应用软件包”，用于安装多数第三方软件和插件；</li>
+<li>root：英语“根”的意思。超级用户 root 的家目录/主目录。一般用户的家目录是位于 /home 下，不过 root 用户是个例外。之前的课程我们也提到过，root 是整个系统的超级用户，拥有一切权限，初学者请慎用此用户模式；</li>
+<li>sbin：英语 system binary 的缩写，表示“系统二进制文件”。比起 bin 目录多了一个前缀 system，所以包含的是系统级的重要可执行程序；</li>
+<li>srv：英语 service的缩写，表示“服务”。包含一些网络服务启动之后所需要取用的数据；</li>
+<li>tmp：英语 temporary 的缩写，表示“临时的”。普通用户和程序存放临时文件的地方；</li>
+<li>usr：英语 Unix Software Resource 的缩写，表示“Unix 操作系统软件资源”（也是个历史遗留的命名）。这个目录是最庞大的目录之一。有点类似 Windows 中的 C:\Windows 和 C:\Program Files 这两个文件夹的集合。在这里面安装了大部分用户要调用的程序；</li>
+<li>var：英语 variable 的缩写，表示“动态的，可变的”。通常包含程序的数据，比如一些 log（日志）文件，记录电脑中发生了什么事。</li>
+</ul>
+</blockquote>
+<p>2.pwd命令查看当前位置：输入pwd命令可以查看当前我处于哪个目录下，当我们刚进去终端的时候，输入pwd，可以看到当前位于：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">liujunchi@ubuntu:~$ pwd</span><br><span class="line">&#x2F;home&#x2F;liujunchi</span><br></pre></td></tr></table></figure>
+
+<p>3.which命令查看某个命令的执行程序的位置：比如说运行which pwd就可以查看输入pwd命令的时候，这个执行程序在哪个位置，以下是示例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">liujunchi@ubuntu:~$ which pwd</span><br><span class="line">&#x2F;bin&#x2F;pwd</span><br><span class="line">liujunchi@ubuntu:~$ which which</span><br><span class="line">&#x2F;usr&#x2F;bin&#x2F;which</span><br><span class="line">liujunchi@ubuntu:~$ which date</span><br><span class="line">&#x2F;bin&#x2F;date</span><br></pre></td></tr></table></figure>
+
+<h2 id="目录命令"><a href="#目录命令" class="headerlink" title="目录命令"></a>目录命令</h2><p>1.ls命令列出文件和目录：ls 是 list 的缩写，是英语“列出”的意思。所以 ls 命令用于列出文件和目录。</p>
+<ul>
+<li>不带任何参数输入ls：</li>
+</ul>
+<p><img src="/2020/03/04/Linux2/3.png" alt></p>
+<p>这个呢就会列出当前目录下的目录和文件(不包括隐藏文件，比如说配置文件)，当然或许大家还会疑惑这些个不同的颜色分别代表什么呢？</p>
+<table>
+<thead>
+<tr>
+<th>颜色</th>
+<th>文件种类</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>红色</td>
+<td>压缩文件</td>
+</tr>
+<tr>
+<td>灰白色</td>
+<td>其它文件</td>
+</tr>
+<tr>
+<td>绿色</td>
+<td>可执行文件</td>
+</tr>
+<tr>
+<td>蓝色</td>
+<td>目录</td>
+</tr>
+<tr>
+<td>浅蓝色</td>
+<td>链接文件</td>
+</tr>
+</tbody></table>
+<ul>
+<li>加入参数a，输入ls -a即可以显示出所有文件，包括各种隐藏文件，毕竟a也是all的缩写嘛：</li>
+</ul>
+<p><img src="/2020/03/04/Linux2/4.png" alt></p>
+<p>包含点(.)文件都是隐藏文件，这下加入a短参数以后都可以列出来了。</p>
+<ul>
+<li>加入l参数列出详细列表(比如说文件的权限，所在的群组，文件大小等等)：ls -l</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">liujunchi@ubuntu:~$ ls -l</span><br><span class="line">total 76</span><br><span class="line">drwxr-xr-x 2 liujunchi liujunchi 4096 Jan 30 23:31 Desktop</span><br><span class="line">drwxr-xr-x 2 liujunchi liujunchi 4096 Jan 30 23:31 Documents</span><br><span class="line">drwxr-xr-x 2 liujunchi liujunchi 4096 Feb 28 05:22 Downloads</span><br><span class="line">-rw-r--r-- 1 liujunchi liujunchi 8980 Jan 30 23:16 examples.desktop</span><br><span class="line">-rwxr-xr-x 1 liujunchi liujunchi 8304 Feb 28 08:02 hello</span><br><span class="line">-rw-r--r-- 1 liujunchi liujunchi   63 Feb 28 07:57 hello.c</span><br><span class="line">drwxr-xr-x 2 liujunchi liujunchi 4096 Jan 30 23:31 Music</span><br><span class="line">-rwxr--r-- 1 liujunchi liujunchi    0 Feb 29 04:39 new_file</span><br><span class="line">drwxr-xr-x 2 liujunchi liujunchi 4096 Jan 30 23:31 Pictures</span><br><span class="line">drwxr-xr-x 2 liujunchi liujunchi 4096 Jan 30 23:31 Public</span><br><span class="line">drwxr-xr-x 2 liujunchi liujunchi 4096 Mar  3 00:40 redirect</span><br><span class="line">drwxr-xr-x 3 liujunchi liujunchi 4096 Feb 29 00:28 rename</span><br><span class="line">drwxr-xr-x 2 liujunchi liujunchi 4096 Jan 30 23:31 Templates</span><br><span class="line">drwxr-xr-x 2 liujunchi liujunchi 4096 Mar  3 00:16 test</span><br><span class="line">-rw-r--r-- 1 liujunchi liujunchi    0 Mar  1 01:43 test_file</span><br><span class="line">drwxr-xr-x 2 liujunchi liujunchi 4096 Jan 30 23:31 Videos</span><br><span class="line">drwxrwxr-x 3 liujunchi liujunchi 4096 Feb 28 01:57 VMtools</span><br></pre></td></tr></table></figure>
+
+<p>这里有很多列通过空格分开来，每一列的信息都不一样，从左往右开始分别为：<strong>文件权限(可读性，可写，可执行等等)，链接的数目，文件的所有者(属于哪个用户)，文件所在的群组(一个linux系统可以有多个用户，不同的用户可以在不同的群组)，文件大小，最近一次修改的世界以及文件或者目录的名称。</strong></p>
+<ul>
+<li>加上h参数可以显示文件的大小，比如说文件是多少K，多少M等等，输入ls -lh(要和l参数一起用)：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">liujunchi@ubuntu:~$ ls -h</span><br><span class="line">Desktop    examples.desktop  Music     Public    Templates  Videos</span><br><span class="line">Documents  hello             new_file  redirect  test       VMtools</span><br><span class="line">Downloads  hello.c           Pictures  rename    test_file</span><br><span class="line">liujunchi@ubuntu:~$ ls -hl</span><br><span class="line">total 76K</span><br><span class="line">drwxr-xr-x 2 liujunchi liujunchi 4.0K Jan 30 23:31 Desktop</span><br><span class="line">drwxr-xr-x 2 liujunchi liujunchi 4.0K Jan 30 23:31 Documents</span><br><span class="line">drwxr-xr-x 2 liujunchi liujunchi 4.0K Feb 28 05:22 Downloads</span><br><span class="line">-rw-r--r-- 1 liujunchi liujunchi 8.8K Jan 30 23:16 examples.desktop</span><br><span class="line">-rwxr-xr-x 1 liujunchi liujunchi 8.2K Feb 28 08:02 hello</span><br><span class="line">-rw-r--r-- 1 liujunchi liujunchi   63 Feb 28 07:57 hello.c</span><br><span class="line">drwxr-xr-x 2 liujunchi liujunchi 4.0K Jan 30 23:31 Music</span><br><span class="line">-rwxr--r-- 1 liujunchi liujunchi    0 Feb 29 04:39 new_file</span><br><span class="line">drwxr-xr-x 2 liujunchi liujunchi 4.0K Jan 30 23:31 Pictures</span><br><span class="line">drwxr-xr-x 2 liujunchi liujunchi 4.0K Jan 30 23:31 Public</span><br><span class="line">drwxr-xr-x 2 liujunchi liujunchi 4.0K Mar  3 00:40 redirect</span><br><span class="line">drwxr-xr-x 3 liujunchi liujunchi 4.0K Feb 29 00:28 rename</span><br><span class="line">drwxr-xr-x 2 liujunchi liujunchi 4.0K Jan 30 23:31 Templates</span><br><span class="line">drwxr-xr-x 2 liujunchi liujunchi 4.0K Mar  3 00:16 test</span><br><span class="line">-rw-r--r-- 1 liujunchi liujunchi    0 Mar  1 01:43 test_file</span><br><span class="line">drwxr-xr-x 2 liujunchi liujunchi 4.0K Jan 30 23:31 Videos</span><br><span class="line">drwxrwxr-x 3 liujunchi liujunchi 4.0K Feb 28 01:57 VMtools</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>加上t参数，按照最近一次修改的时间顺序列出所有文件或者目录，需要和l参数配合使用：ls -lt</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">liujunchi@ubuntu:~$ ls -t</span><br><span class="line">redirect   new_file  hello.c    Documents  Public     Desktop</span><br><span class="line">test       rename    Downloads  Music      Templates  examples.desktop</span><br><span class="line">test_file  hello     VMtools    Pictures   Videos</span><br><span class="line">liujunchi@ubuntu:~$ ls -lt</span><br><span class="line">total 76</span><br><span class="line">drwxr-xr-x 2 liujunchi liujunchi 4096 Mar  3 00:40 redirect</span><br><span class="line">drwxr-xr-x 2 liujunchi liujunchi 4096 Mar  3 00:16 test</span><br><span class="line">-rw-r--r-- 1 liujunchi liujunchi    0 Mar  1 01:43 test_file</span><br><span class="line">-rwxr--r-- 1 liujunchi liujunchi    0 Feb 29 04:39 new_file</span><br><span class="line">drwxr-xr-x 3 liujunchi liujunchi 4096 Feb 29 00:28 rename</span><br><span class="line">-rwxr-xr-x 1 liujunchi liujunchi 8304 Feb 28 08:02 hello</span><br><span class="line">-rw-r--r-- 1 liujunchi liujunchi   63 Feb 28 07:57 hello.c</span><br><span class="line">drwxr-xr-x 2 liujunchi liujunchi 4096 Feb 28 05:22 Downloads</span><br><span class="line">drwxrwxr-x 3 liujunchi liujunchi 4096 Feb 28 01:57 VMtools</span><br><span class="line">drwxr-xr-x 2 liujunchi liujunchi 4096 Jan 30 23:31 Documents</span><br><span class="line">drwxr-xr-x 2 liujunchi liujunchi 4096 Jan 30 23:31 Music</span><br><span class="line">drwxr-xr-x 2 liujunchi liujunchi 4096 Jan 30 23:31 Pictures</span><br><span class="line">drwxr-xr-x 2 liujunchi liujunchi 4096 Jan 30 23:31 Public</span><br><span class="line">drwxr-xr-x 2 liujunchi liujunchi 4096 Jan 30 23:31 Templates</span><br><span class="line">drwxr-xr-x 2 liujunchi liujunchi 4096 Jan 30 23:31 Videos</span><br><span class="line">drwxr-xr-x 2 liujunchi liujunchi 4096 Jan 30 23:31 Desktop</span><br><span class="line">-rw-r--r-- 1 liujunchi liujunchi 8980 Jan 30 23:16 examples.desktop</span><br></pre></td></tr></table></figure>
+
+<p>以上的参数可以一起配合使用，多个短参数可以合并在一起，比如说：ls -alth就是列出当前目录的所有文件以及按照最近一次修改的时间顺序列出详细列表(包括具体的文件大小)。</p>
+<p>2.cd命令切换目录：cd 是英语 change directory 的缩写，表示“切换目录”。顾名思义，cd 命令是用于切换目录的命令。</p>
+<ul>
+<li>转到根目录：cd /</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">liujunchi@ubuntu:~&#x2F;test$ pwd</span><br><span class="line">&#x2F;home&#x2F;liujunchi&#x2F;test</span><br><span class="line">liujunchi@ubuntu:~&#x2F;test$ cd &#x2F;</span><br><span class="line">liujunchi@ubuntu:&#x2F;$ pwd</span><br><span class="line">&#x2F;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>回到上一级目录：cd ..(cd后面接两个点)：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">liujunchi@ubuntu:~$ cd test</span><br><span class="line">liujunchi@ubuntu:~&#x2F;test$ cd ..</span><br><span class="line">liujunchi@ubuntu:~$</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>连续后退两级目录：cd ../..</li>
+</ul>
+<p>3.du命令显示当前目录包含文件的大小以及路径</p>
+<ul>
+<li>单独输入du命令可以列出文件大小的列表</li>
+<li>加上h参数会显示出文件的具体大小，多少K，多少M：du -h</li>
+<li>加上a参数可以把大小和所有文件路径名称都显示出来：du -a</li>
+<li>加上s参数只显示当前目录总计文件大小：du -s</li>
+</ul>
+<p>示例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">liujunchi@ubuntu:~&#x2F;test$ du</span><br><span class="line">36	.</span><br><span class="line">liujunchi@ubuntu:~&#x2F;test$ du -h</span><br><span class="line">36K	.</span><br><span class="line">liujunchi@ubuntu:~&#x2F;test$ du -a</span><br><span class="line">4	.&#x2F;number.txt</span><br><span class="line">4	.&#x2F;name.txt</span><br><span class="line">4	.&#x2F;hello.cpp</span><br><span class="line">4	.&#x2F;nane_sort.txt</span><br><span class="line">4	.&#x2F;unique.txt</span><br><span class="line">4	.&#x2F;repeat.txt</span><br><span class="line">4	.&#x2F;M-M</span><br><span class="line">4	.&#x2F;china.txt</span><br><span class="line">36	.</span><br><span class="line">liujunchi@ubuntu:~&#x2F;test$ du -s</span><br><span class="line">36	.</span><br></pre></td></tr></table></figure>
+
+<h2 id="浏览与创建文件"><a href="#浏览与创建文件" class="headerlink" title="浏览与创建文件"></a>浏览与创建文件</h2><p><strong>1.cat命令一次性显示浏览文件内容：</strong> 使用该命令浏览某个文件的时候，会一次性把所有内容打印到终端显示出来</p>
+<ul>
+<li>不加参数浏览：cat 某个文件名：</li>
+</ul>
+<p><img src="/2020/03/04/Linux2/5.png" alt></p>
+<ul>
+<li>如果说想要在显示的内容上加上行号，就是这一行内容对应着内容的第几行：cat -n example.destop</li>
+<li>cat还可以同时显示多个文件的内容，只不过内容是这个文件显示完了之后，下一个文件显示的内容继续拼接到后面去，连续显示出来这些个文件内容：cat syslog dpkg.log</li>
+</ul>
+<p><strong>2.less命令分页查看文件内容</strong>：这个不像cat一口气吃成大胖子，一次性把所有内容显示出来，如果文件内容比较多，几乎占领整个终端，不方便去浏览，因此less就解决了这个问题，是把文件内容分页显示，可以一页页的看到文件内容。</p>
+<p><img src="/2020/03/04/Linux2/6.png" alt></p>
+<p>输入less hello.c以后，可以分页展示内容，当然上述示例内容只有一页，所有下面显示了END，说明已经是最后一页的内容，内容到底了。</p>
+<p>进入分页浏览模式以后，我们可以掌握以下几个快捷键方便我们阅读：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">空格键：文件内容读取下一个终端屏幕的行数，相当于前进一个屏幕（页）。很常用的快捷键。与键盘上的 PageDown（下一页）效果一样；</span><br><span class="line">回车键：文件内容读取下一行，也就是前进一行，与键盘上的向下键效果是一样的；</span><br><span class="line">d 键：前进半页（半个屏幕）；</span><br><span class="line">b 键：后退一页，与键盘上的 PageUp（上一页）效果一样；</span><br><span class="line">y 键：后退一行，与键盘上的向上键效果是一样的；</span><br><span class="line">u 键：后退半页（半个屏幕）；</span><br><span class="line">q 键：停止读取文件，中止 less 命令。</span><br></pre></td></tr></table></figure>
+
+<p>当然还有一些高级的快捷键，比如说查找你需要的某个内容，看看你现在看到都内容是在文件里面的具体哪一行那一页等等。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#x3D; 号：显示你在文件中的什么位置（会显示当前页面的内容是文件中第几行到第几行，整个文件所含行数，所含字符数，整个文件所含字符）；</span><br><span class="line">h 键：显示帮助文档，按 q 键退出帮助文档；</span><br><span class="line">&#x2F;（斜杠）：进入搜索模式，只要在斜杠后面输入你要搜索的文字，按下回车键，就会把所有符合的结果都标识出来。要在搜索所得结果中跳转，可以按 n 键（跳到下一个符合项目），N 键（shift 键 + n。跳到上一个符合项目）。当然了，正则表达式（Regular Expression）也是可以用在搜索内容中的。这里我们就不细说什么是正则表达式了，有兴趣可以 百度 &#x2F; Google 看看；</span><br><span class="line">n 键：跳到下一个符合的搜索结果；</span><br><span class="line">N 键：跳到上一个符合的搜索结果。</span><br></pre></td></tr></table></figure>
+
+<p>可见，less命令是如此的强大，浏览起来真的方便。</p>
+<p>3.head和tail命令查看文件内容的开头和结尾。</p>
+<ul>
+<li><p>head命令显示文件的开头，默认情况下，是显示文件内容的前10行，比如说输入：<code>head test.txt</code>，就会显示出test文件内容的前10行。当然如果说我们指定要看多少行可以加入n参数：<code>head -n 5 test.txt</code> 就是显示test文件内容的前5行。</p>
+</li>
+<li><p>tail命令显示文件的结尾，默认情况下显示文件内容的后10行，当然我们也可以像上面一样指定显示的行数，具体形式和上面一样，博主就不多说了。当然，tail还不止这点本事，它还可以实时追踪文件的更新，输入<code>tail -f test.txt</code> 这个时候就会跟踪更新内容，如果更新，后面还会继续出现内容。当然还可以加入s参数设置追踪更新内容的时间，比如说输入<code>tail -f -s 4 test.txt</code> 就是每隔4秒看一下内容的更新。 </p>
+</li>
+</ul>
+<p><strong>4.touch命令创建文件：</strong>后面加上文件名即可以创建好对应的文件，文件种类任意，比如说其他文件(不带后缀)或者txt文件(后缀为.txt)：<code>touch test</code>和<code>touch test.txt</code>。当然touch可以同时创建多个文件，它后面可以接多个文件名从而创建这些文件：<code>touch file1 file2</code>。这个就创建了file1和file2文件。如果说文件名带有空格，那么就可以用双引号括起来：touch “test file”</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">liujunchi@ubuntu:~&#x2F;test$ ls</span><br><span class="line">china.txt  M-M       nane_sort.txt  repeat.txt</span><br><span class="line">hello.cpp  name.txt  number.txt     unique.txt</span><br><span class="line">liujunchi@ubuntu:~&#x2F;test$ touch test.txt</span><br><span class="line">liujunchi@ubuntu:~&#x2F;test$ ls</span><br><span class="line">china.txt  M-M       nane_sort.txt  repeat.txt  unique.txt</span><br><span class="line">hello.cpp  name.txt  number.txt     test.txt</span><br></pre></td></tr></table></figure>
+
+<p>5.mkdir命令创建目录：这个用法和上面类似，可以创建一个目录，也可以同时创建多个目录，不过不同的是它可以递归地创建目录(把这个目录以及它的子目录都创建好)：<code>mkdir -p 1/2/3</code> 加上p参数即可，这个就创建了1目录，以及它的子目录2，和子子目录3。有意思吧。 </p>
+<h2 id="复制删除移动链接文件"><a href="#复制删除移动链接文件" class="headerlink" title="复制删除移动链接文件"></a>复制删除移动链接文件</h2><p><strong>1.cp命令实现文件的复制</strong>：cp不是我们所说的情侣CP，而是copy的缩写，因此用来复制。</p>
+<ul>
+<li>把一个文件复制到另外一个文件：<code>cp file1 file2</code> 这个就会把file1文件复制到file2中，前提是file1存在，如果说file2文件不存在，那么就会创建file2这个文件，且file2文件内容是file1文件的复制。当然，如果file2存在，file1的内容就会复制到file2中，覆盖原来内容。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">liujunchi@ubuntu:~&#x2F;new_file1$ ls</span><br><span class="line">test</span><br><span class="line">liujunchi@ubuntu:~&#x2F;new_file1$ cp test test_copy</span><br><span class="line">liujunchi@ubuntu:~&#x2F;new_file1$ ls</span><br><span class="line">test  test_copy</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>把一个文件复制到目录中：cp 文件名 目录名。如果说这个目录本身就是当前目录的子目录，可以直接输入目录的名字，如果说这个目录不在当前目录中，那么就需要加上这个目录的路径了。如果说你复制到目录中以后，想把文件名改为想要的，直接目录名后接重命名的名字即可，示例如下：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">liujunchi@ubuntu:~&#x2F;new_file1$ ls</span><br><span class="line">test  test_copy  test_dir</span><br><span class="line">liujunchi@ubuntu:~&#x2F;new_file1$ cp test test_dir</span><br><span class="line">liujunchi@ubuntu:~&#x2F;new_file1$ cd test_dir</span><br><span class="line">liujunchi@ubuntu:~&#x2F;new_file1&#x2F;test_dir$ ls</span><br><span class="line">test</span><br><span class="line">liujunchi@ubuntu:~&#x2F;new_file1&#x2F;test_dir$ ls</span><br><span class="line">test</span><br><span class="line">liujunchi@ubuntu:~&#x2F;new_file1&#x2F;test_dir$ cd ..</span><br><span class="line">liujunchi@ubuntu:~&#x2F;new_file1$ cp test test_dir&#x2F;new_file</span><br><span class="line">liujunchi@ubuntu:~&#x2F;new_file1$ cd test_dir</span><br><span class="line">liujunchi@ubuntu:~&#x2F;new_file1&#x2F;test_dir$ ls</span><br><span class="line">new_file  test</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>拷贝一个目录：拷贝目录的时候，目录中所有的文件或者子目录都会被拷贝，这个命令需要加上r参数，进行递归的拷贝，因为目录当中可能还有子目录：<code>cp -r dir1 dir2</code> </li>
+<li>使用通配符’<em>‘：通配符是比较常用的正则表达式，可以代替任何字符串，比如说<code>cp *.txt folder</code>,这个就可以把当前目录所有的.txt文件复制到folder目录中，因为*可以代替任何字符串，比如说1.txt,2.txt,3.txt都可以被</em>.txt代替。</li>
+</ul>
+<p><strong>2.移动文件或者目录：</strong> 移动不像复制，只是单纯地移动文件或者目录，不会生成副本。</p>
+<ul>
+<li>移动文件或者目录：<code>mv file1 dir1</code>，假设file1是文件，dir1是当前的子目录，那么file1就可以通过这个命令直接移动到dir1中，此时不会生成副本，是自己亲自出手，因此当前目录不再有file1文件，此时它身在dir1.移动目录也同上，第一个为被移动的，第二个为去哪儿。</li>
+<li>重命名：如果说你看某个文件的名字不爽，那么你也可以通过这个命令改名字：<code>mv 当前名字 想要重命名的名字</code>，假设输入：mv fil1 file2，那么file1的名字就会变成file2，但是前提是file2这个名字在这个目录中本身是不存在的，否则就会被移动到这个文件或者目录中，不会重命名。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">liujunchi@ubuntu:~&#x2F;new_file1&#x2F;test_dir$ ls</span><br><span class="line">new_file  test</span><br><span class="line">liujunchi@ubuntu:~&#x2F;new_file1&#x2F;test_dir$ mv test test1</span><br><span class="line">liujunchi@ubuntu:~&#x2F;new_file1&#x2F;test_dir$ ls</span><br><span class="line">new_file  test1</span><br><span class="line">liujunchi@ubuntu:~&#x2F;new_file1&#x2F;test_dir$ mkdir te</span><br><span class="line">liujunchi@ubuntu:~&#x2F;new_file1&#x2F;test_dir$ ls</span><br><span class="line">new_file  te  test1</span><br><span class="line">liujunchi@ubuntu:~&#x2F;new_file1&#x2F;test_dir$ mv test1 te</span><br><span class="line">liujunchi@ubuntu:~&#x2F;new_file1&#x2F;test_dir$ ls</span><br><span class="line">new_file  te</span><br><span class="line">liujunchi@ubuntu:~&#x2F;new_file1&#x2F;test_dir$ cd te</span><br><span class="line">liujunchi@ubuntu:~&#x2F;new_file1&#x2F;test_dir&#x2F;te$ ls</span><br><span class="line">test1</span><br></pre></td></tr></table></figure>
+
+<p>3.rm删除文件或者目录：rm是remove的缩写，用来删除。</p>
+<ul>
+<li>单独使用，不加参数：rm file1，这样就可以删除file1的文件(当前目录中)，但是这样只能删除文件，要删除目录的话，还得加上参数，这个问题暂时留着。</li>
+<li>加上i参数询问删除：rm -i file1，执行这个命令，终端会问你是否确认删除，叫你输入Y/N，你想删除的话就输入Y，不想的话就输入N，当然这个命令也是为了保险，放在你发脾气随便删文件，一询问或许就会消消气。</li>
+<li>加上f参数暴力删除：这个命令就很危险了，你一输入就无法挽回你的错误(当然还是有办法的，但是会特别麻烦，博主也不懂)，尽量少用这个命令吧，你输入：rm -f file1，真的就直接暴力删除了file1文件了，你无法挽回了。</li>
+<li>加上r参数递归删除目录：诶，刚刚不是说要删除目录嘛，这个参数就OK了，比如说：<code>rm -r dir1</code>，这样就可以把dir1目录当中所有的文件(包括这个目录和子目录)都会删除。但是呢，你也可以加上f参数：rm -rf 啥啥啥，这个就会强制性删除了，不过你千万别再加上通配符’*’，不然就是惊天动地，你的东西可能si光光了。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">liujunchi@ubuntu:~&#x2F;new_file1$ ls</span><br><span class="line">new_file  test  test_copy  test_dir</span><br><span class="line">liujunchi@ubuntu:~&#x2F;new_file1$ rm test</span><br><span class="line">liujunchi@ubuntu:~&#x2F;new_file1$ ls</span><br><span class="line">new_file  test_copy  test_dir</span><br><span class="line">liujunchi@ubuntu:~&#x2F;new_file1$ rm -i test_copy</span><br><span class="line">rm: remove regular empty file &#39;test_copy&#39;? y</span><br><span class="line">liujunchi@ubuntu:~&#x2F;new_file1$ ls</span><br><span class="line">new_file  test_dir</span><br><span class="line">liujunchi@ubuntu:~&#x2F;new_file1$ rm -r test_dir</span><br><span class="line">liujunchi@ubuntu:~&#x2F;new_file1$ ls</span><br><span class="line">new_file</span><br></pre></td></tr></table></figure>
+
+<p><strong>4.ln链接文件:</strong> ln 是 link 的缩写，在英语中表示“链接”。所以 ln 命令用于在文件之间创建链接。</p>
+<ul>
+<li>创建硬链接：不加任何参数，直接用ln就可以创建文件之间的硬链接了：<code>ln file1 file2</code> ，这个就可以在file1和file2之间创建硬链接，如果没有file2这个文件，那么就会自动创建，此时file1和file2指向同一个文件内容，也就是说他们共享文件内容，file1文件内容改变了，file2的文件内容也会改变，而且和file1一模一样。因此，file1和file2的Inode是一样的(Inode大家可以百度一下，也可以看看我的博客<a href="https://liujunchi-bot.github.io/2020/02/19/caozuoxitong/#Linux文件的基本操作">《玩转操作系统》</a> 里面讲的比较清楚) 。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">liujunchi@ubuntu:~&#x2F;new_file1$ ls</span><br><span class="line">file1  new_file</span><br><span class="line">liujunchi@ubuntu:~&#x2F;new_file1$ ln file1 file2</span><br><span class="line">liujunchi@ubuntu:~&#x2F;new_file1$ ls</span><br><span class="line">file1  file2  new_file</span><br><span class="line">liujunchi@ubuntu:~&#x2F;new_file1$ ls -i</span><br><span class="line">416277 file1  416277 file2  655471 new_file</span><br><span class="line">liujunchi@ubuntu:~&#x2F;new_file1$ nano file1</span><br><span class="line">liujunchi@ubuntu:~&#x2F;new_file1$ cat file1</span><br><span class="line">1111111</span><br><span class="line">liujunchi@ubuntu:~&#x2F;new_file1$ cat file2</span><br><span class="line">1111111</span><br><span class="line">我创建了file1和file2之间的硬链接，可以发现他们的文件Inode都为416227，</span><br><span class="line">而且我用nano(后面会讲)编辑器在file1文件里面输入了1111111内容，发现使用cat查看两个文件内容</span><br><span class="line">的时候，两个内容都为1111111.神奇吧，不过一般很少用硬链接，用的多的说下面的软链接。</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>加s参数创建软链接：创建软链接以后，两个文件的内容也是一样的，但是指向不一样：ln -s file1 file3，就是创建了file1和file3之间的软链接，此时file1指向它的文件内容，file3指向file1，而不是文件内容，但是二者内容还是一样的，毕竟file3指向file1嘛。如果删除了file3，当然不会对file1有影响，但是删除file1以后，file3就会出大事，其就会损坏，因为没了头头。二者inode也是不一样的。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">liujunchi@ubuntu:~&#x2F;new_file1$ ln -s file1 file3</span><br><span class="line">liujunchi@ubuntu:~&#x2F;new_file1$ ls</span><br><span class="line">file1  file2  file3  new_file</span><br><span class="line">liujunchi@ubuntu:~&#x2F;new_file1$ ls -i</span><br><span class="line">416277 file1  416277 file2  416295 file3  655471 new_file</span><br><span class="line">liujunchi@ubuntu:~&#x2F;new_file1$ cat file3</span><br><span class="line">1111111</span><br><span class="line">liujunchi@ubuntu:~&#x2F;new_file1$ nano file1</span><br><span class="line">liujunchi@ubuntu:~&#x2F;new_file1$ cat file1</span><br><span class="line"></span><br><span class="line">1111111</span><br><span class="line">111</span><br><span class="line">11</span><br><span class="line">1</span><br><span class="line">liujunchi@ubuntu:~&#x2F;new_file1$ cat file3</span><br><span class="line"></span><br><span class="line">1111111</span><br><span class="line">111</span><br><span class="line">11</span><br><span class="line">1</span><br><span class="line">liujunchi@ubuntu:~&#x2F;new_file1$ rm file1</span><br><span class="line">liujunchi@ubuntu:~&#x2F;new_file1$ ls</span><br><span class="line">file2  file3  new_file</span><br><span class="line">liujunchi@ubuntu:~&#x2F;new_file1$ ls -i</span><br><span class="line">416277 file2  416295 file3  655471 new_file</span><br><span class="line">liujunchi@ubuntu:~&#x2F;new_file1$ cat file3</span><br><span class="line">cat: file3: No such file or directory</span><br><span class="line">删除file1以后，file3有原来的灰白色(普通文件)变成了深红色(无效文件)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>二者原理图：</li>
+</ul>
+<p><img src="/2020/03/04/Linux2/7.jpg" alt="硬链接"></p>
+<p><img src="/2020/03/04/Linux2/8.jpg" alt="软链接"></p>
+<h2 id="探秘用户和群组"><a href="#探秘用户和群组" class="headerlink" title="探秘用户和群组"></a>探秘用户和群组</h2><p>1.adduser命令添加新用户：只不过着命令需要权限，普通用户下可没这个权力，因此需要进入root超级大管家模式才可以执行，执行以后会叫我们输入用户密码，输入完以后，其它的文件名啥的就直接enter不用管，最后确认信息正确就OK了，查看家目录可以看到两个用户文件夹。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">liujunchi@ubuntu:~$ sudo su</span><br><span class="line">[sudo] password for liujunchi: </span><br><span class="line">root@ubuntu:&#x2F;home&#x2F;liujunchi# adduser Job</span><br><span class="line">adduser: Please enter a username matching the regular expression configured</span><br><span class="line">via the NAME_REGEX[_SYSTEM] configuration variable.  Use the &#96;--force-badname&#39;</span><br><span class="line">option to relax this check or reconfigure NAME_REGEX.</span><br><span class="line">root@ubuntu:&#x2F;home&#x2F;liujunchi# adduser thomas</span><br><span class="line">Adding user &#96;thomas&#39; ...</span><br><span class="line">Adding new group &#96;thomas&#39; (1001) ...</span><br><span class="line">Adding new user &#96;thomas&#39; (1001) with group &#96;thomas&#39; ...</span><br><span class="line">Creating home directory &#96;&#x2F;home&#x2F;thomas&#39; ...</span><br><span class="line">Copying files from &#96;&#x2F;etc&#x2F;skel&#39; ...</span><br><span class="line">Enter new UNIX password: </span><br><span class="line">Retype new UNIX password: </span><br><span class="line">passwd: password updated successfully</span><br><span class="line">Changing the user information for thomas</span><br><span class="line">Enter the new value, or press ENTER for the default</span><br><span class="line">	Full Name []: </span><br><span class="line">	Room Number []: </span><br><span class="line">	Work Phone []: </span><br><span class="line">	Home Phone []: </span><br><span class="line">	Other []: </span><br><span class="line">Is the information correct? [Y&#x2F;n] y</span><br><span class="line">root@ubuntu:&#x2F;home&#x2F;liujunchi# ls &#x2F;home</span><br><span class="line">liujunchi  thomas</span><br></pre></td></tr></table></figure>
+
+<p>2.passwd改用户密码：如果你想改密码，那么就可以通过这个命令实现，后面输入你想要改的用户的名字，如<code>passwd liujunchi</code>。</p>
+<p>3.deluser删除用户：这个要在root模式下执行，如果说你不想要这个用户了，可以用这个来删除：<code>deluser thomas</code>，但是这个仅仅只是删除了用户，没有删除在home目录下的用户目录thomas，如果你想一波删除，可以：<code>deluser --remove-home thomas</code>.</p>
+<p>4.addgroup创建群组：对于群组我们之前也说过了，利用ls -l查看文件的时候可以看到：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">root@ubuntu:&#x2F;home# ls -l</span><br><span class="line">total 8</span><br><span class="line">drwxr-xr-x 25 liujunchi liujunchi 4096 Mar  3 18:14 liujunchi</span><br><span class="line">drwxr-xr-x  2 thomas    thomas    4096 Mar  3 20:19 thomas</span><br><span class="line">第三列就是文件所属的群组了</span><br></pre></td></tr></table></figure>
+
+<p>我们输入<code>addgroup friends</code>以后就可以创建名字为friends的群组了，但是此时这个群组是空的，因此还需要添加用户。</p>
+<p>5.usermod修改用户：这个可以修改用户名和用户所在的群组等等。</p>
+<p>usermod 命令参数比较多，可以实现不同的功能。不过我们暂时只需要记得它的两个参数：</p>
+<ul>
+<li>-l：对用户重命名，但是 /home 目录中的用户家目录名不会改变，需要手动修改；</li>
+<li>-g：修改用户所在群组。此用户的家目录里的所有文件的所在群组会相应改变。</li>
+</ul>
+<p>usermod -g friends thomas：把用户thomas所在群组改为friends</p>
+<p>usermod -g thomas thomas1：把用户thomas的名字改为thomas1</p>
+<p>6.delgroup命令删除群组：这个可以删除某个群组，比如说delgroup friends就是删除friends群组，输入groups命令可以查看群组。比如说groups thomas：就会出现：thomas：thomas，就是查看用户thomas所在的群组，发现其在群组thomas中。</p>
+<h2 id="文件权限管理"><a href="#文件权限管理" class="headerlink" title="文件权限管理"></a>文件权限管理</h2><p>1.chown修改文件的所有者：chown 是 change 和 owner 的缩写，change 是英语“改变”的意思，owner 是英语“所有者”的意思，因此可以用来修改所有者。这个需要在root模式下进行，一般后面是先接用户名，后接文件名，就可以把文件的所有者改为这个用户了。通过ls -l 某个文件可以查看这个文件的所有者。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">root@ubuntu:&#x2F;home&#x2F;liujunchi# ls -l test_file</span><br><span class="line">-rw-r--r-- 1 liujunchi liujunchi 0 Mar  1 01:43 test_file</span><br><span class="line">root@ubuntu:&#x2F;home&#x2F;liujunchi# chown thomas test_file</span><br><span class="line">root@ubuntu:&#x2F;home&#x2F;liujunchi# ls -l test_file</span><br><span class="line">-rw-r--r-- 1 thomas liujunchi 0 Mar  1 01:43 test_file</span><br><span class="line">改完以后，第二列文件所有者由liujunchi变成了thomas。</span><br></pre></td></tr></table></figure>
+
+<p>当然，你需要快速让一个用户占领一个目录当中的所有文件或者子目录，可以加上R参数：<code>chown -R liujunhi:liujunchi /home/thomas</code> 这样就可以把/home/thomas目录当中所有文件和子目录递归地占为己有，把其所有者和群组都变成liujunchi。</p>
+<p>2.chgrp改变文件的群组：chgrp 是 change 和 group 的缩写，change 是英语“改变”的意思，group 是英语“群组”的意思。chgrp 命令用于改变文件的群组。用法和上面一样。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">root@ubuntu:&#x2F;home&#x2F;liujunchi# ls -l test_file</span><br><span class="line">-rw-r--r-- 1 thomas liujunchi 0 Mar  1 01:43 test_file</span><br><span class="line">root@ubuntu:&#x2F;home&#x2F;liujunchi# chgrp friend test_file</span><br><span class="line">root@ubuntu:&#x2F;home&#x2F;liujunchi# ls -l test_file</span><br><span class="line">-rw-r--r-- 1 thomas friend 0 Mar  1 01:43 test_file</span><br><span class="line">第三列群组变成了friend</span><br></pre></td></tr></table></figure>
+
+<p>3.chmod修改文件访问权限：这个可以修改文件的读写执行的权限。</p>
+<p>我们先输入ls -l查看各个文件的详细信息：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">liujunchi@ubuntu:~&#x2F;new_file1&#x2F;new_file$ ls -l</span><br><span class="line">total 4</span><br><span class="line">-rw-r--r-- 1 liujunchi liujunchi    0 Mar  4 02:24 1</span><br><span class="line">-rw-r--r-- 1 liujunchi liujunchi    0 Mar  4 02:25 2</span><br><span class="line">drwxr-xr-x 2 liujunchi liujunchi 4096 Mar  4 02:25 test</span><br></pre></td></tr></table></figure>
+
+<p>第一列哪个rw啥啥啥就是这个文件或者目录的权限，我们来看看每个字母的意思：</p>
+<ul>
+<li>d：英语 directory 的缩写，表示“目录”。就是说这是一个目录；</li>
+<li>l：英语 link 的缩写，表示“链接”。就是说这是一个链接；</li>
+<li>r：英语 read 的缩写，表示“读”。就是说可以读这个文件；</li>
+<li>w：英语 write 的缩写，表示“写”。就是说可以写这个文件，也就是可以修改；</li>
+<li>x：英语 execute 的缩写，表示“执行，运行”。就是说可以运行这个文件。</li>
+</ul>
+<p>那为什么会有重复的r啥啥，然后还有很多杠，博主来解释一下吧：</p>
+<p>除了第一个符号表示的是文件的类型( d，表示目录；如果是 l，则是链接；还有其它字母，我们暂时不深究；如果是短横 - ，那么是普通文件)，其它的符号被’-‘分为三组：</p>
+<ul>
+<li>第一组 rwx 表示文件的所有者对于此文件的访问权限；</li>
+<li>第二组 rwx 表示文件所属群组的其他用户对于此文件的访问权限；</li>
+<li>第三组 rwx 表示除前两组之外的其他用户对于此文件的访问权限。</li>
+</ul>
+<p>来看看一个例子，就拿上面的第一行信息为例吧(从左到右)：</p>
+<p>-rw-r–r– 1 liujunchi liujunchi    0 Mar  4 02:24 1</p>
+<ul>
+<li>第一个符号’-‘代表的是1这个文件是普通文件</li>
+<li>rw-表示这个文件在所有者当中是可读可写的</li>
+<li>r–表示这个文件在所属群组的其它用户里是可读的</li>
+<li>之后的r–是表示这个文件在其它用户中是可读的</li>
+</ul>
+<p><strong>真正的重点来了！！！来看看如何修改文件的权限吧：</strong></p>
+<ul>
+<li>其实Linux系统为每一种权限都分配了数字：</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>权限</th>
+<th>数字</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>r</td>
+<td>4</td>
+</tr>
+<tr>
+<td>w</td>
+<td>2</td>
+</tr>
+<tr>
+<td>x</td>
+<td>1</td>
+</tr>
+</tbody></table>
+<p>一般根据数字的值来分配文件权限，一下是各种可能的组合：</p>
+<table>
+<thead>
+<tr>
+<th>权限组合</th>
+<th>数字</th>
+<th>计算</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>–</td>
+<td>0(0就是什么权限都没有)</td>
+<td>0+0+0</td>
+</tr>
+<tr>
+<td>r-</td>
+<td>4</td>
+<td>4+0+0</td>
+</tr>
+<tr>
+<td>-w-</td>
+<td>2</td>
+<td>0+2+0</td>
+</tr>
+<tr>
+<td>-x</td>
+<td>1</td>
+<td>0+0+1</td>
+</tr>
+<tr>
+<td>rw-</td>
+<td>6</td>
+<td>4+2+0</td>
+</tr>
+<tr>
+<td>-wx</td>
+<td>3</td>
+<td>0+2+1</td>
+</tr>
+<tr>
+<td>r-x</td>
+<td>5</td>
+<td>4+0+1</td>
+</tr>
+<tr>
+<td>rwx</td>
+<td>7</td>
+<td>4+2+1</td>
+</tr>
+</tbody></table>
+<ul>
+<li>通过数字分配权限，对用户+所属群组其它用户+对其它用户这三组权限，分配的时候，需要把数字连在一起，比如说：<code>chmod 765 1</code> 就是分别给这个文件在所属用户分配可读可写可执行的权限，所属群组其它用户分配可读可写的权限，其它用户分配可读可执行的权限。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">liujunchi@ubuntu:~&#x2F;new_file1&#x2F;new_file$ ls -l</span><br><span class="line">total 4</span><br><span class="line">-rw-r--r-- 1 liujunchi liujunchi    0 Mar  4 02:24 1</span><br><span class="line">-rw-r--r-- 1 liujunchi liujunchi    0 Mar  4 02:25 2</span><br><span class="line">drwxr-xr-x 2 liujunchi liujunchi 4096 Mar  4 02:25 test</span><br><span class="line">liujunchi@ubuntu:~&#x2F;new_file1&#x2F;new_file$ chmod 765 1</span><br><span class="line">liujunchi@ubuntu:~&#x2F;new_file1&#x2F;new_file$ ls -l</span><br><span class="line">total 4</span><br><span class="line">-rwxrw-r-x 1 liujunchi liujunchi    0 Mar  4 02:24 1</span><br><span class="line">-rw-r--r-- 1 liujunchi liujunchi    0 Mar  4 02:25 2</span><br><span class="line">drwxr-xr-x 2 liujunchi liujunchi 4096 Mar  4 02:25 test</span><br><span class="line">现在1文件的权限就修改了。</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>通过字母分配：我们还可以通过不同的字母和符号来进行分配，来看看不同字母的表达意思：</p>
+<ul>
+<li><p>u：user 的缩写，是英语“用户”的意思。表示所有者；</p>
+</li>
+<li><p>g：group 的缩写，是英语“群组”的意思。表示群组用户；</p>
+</li>
+<li><p>o：other 的缩写，是英语“其他”的意思。表示其他用户；</p>
+</li>
+<li><p>a：all 的缩写，是英语“所有”的意思。表示所有用户。</p>
+<p>这些字母还需要配合一些符号使用：</p>
+<ul>
+<li>+：加号，表示添加权限；</li>
+<li>-：减号，表示去除权限；</li>
+<li>=：等号，表示分配权限。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>咱们来看几个例子就懂了：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">#文件 file.txt 的所有者增加读和运行的权限。</span><br><span class="line">chmod u+rx file.txt</span><br><span class="line"></span><br><span class="line">#文件 file.txt 的群组其他用户增加读的权限。</span><br><span class="line">chmod g+r file.txt </span><br><span class="line"></span><br><span class="line">#文件 file.txt 的其他用户移除读的权限。</span><br><span class="line">chmod o-r file.txt </span><br><span class="line"></span><br><span class="line">#文件 file.txt 的群组其他用户增加读的权限，其他用户移除读的权限。</span><br><span class="line">chmod g+r o-r file.txt </span><br><span class="line"></span><br><span class="line">#文件 file.txt 的群组其他用户和其他用户均移除读的权限。</span><br><span class="line">chmod go-r file.txt </span><br><span class="line"></span><br><span class="line">#文件 file.txt 的所有用户增加运行的权限。</span><br><span class="line">chmod +x file.txt </span><br><span class="line"></span><br><span class="line">#文件 file.txt 的所有者分配读，写和执行的权限；</span><br><span class="line">#群组其他用户分配读的权限，不能写或执行；</span><br><span class="line">#其他用户没有任何权限。</span><br><span class="line">chmod u&#x3D;rwx,g&#x3D;r,o&#x3D;- file.txt</span><br></pre></td></tr></table></figure>
+
+<p>当然，也可以加上R参数进行递归分配权限，把目录的所有文件和子目录分配权限：chmod -R 642 1/2/3</p>
+<h2 id="nano编辑器"><a href="#nano编辑器" class="headerlink" title="nano编辑器"></a>nano编辑器</h2><ul>
+<li>启动nano编辑器：直接输入<code>nano</code>就可以启动了。界面如下：</li>
+</ul>
+<p><img src="/2020/03/04/Linux2/9.jpg" alt="nano"></p>
+<p>然后我们就可以在里面输入文字了。</p>
+<ul>
+<li>利用nano编辑器编辑文件：输入<code>nano file1(随便哪个文件名都可以)</code> 这样就可以直接进入nano编辑器界面编辑file1文件了，如果说没有file1这个文件，就会自动创建，编辑完以后，直接按ctrl+o保存就可以了，保存以后，下面会提示：<code>File Name to Write</code> 这个就是叫我们输入文件名，把这个文件保存为什么文件，输入完以后，按enter即可，然后按ctrl+x退出就可以了。以下是nano编辑器界面的一些快捷键：<ul>
+<li>Ctrl+G：显示帮助文档</li>
+<li>Ctrl+O：保存文件</li>
+<li>Ctrl+R：打开其他文件</li>
+<li>Ctrl+Y：上一个屏幕</li>
+<li>Ctrl+V：下一个屏幕</li>
+<li>Ctrl+K：剪切当前一行</li>
+<li>Ctrl+X：退出</li>
+<li>Ctrl+W：查找</li>
+<li>Ctrl+U：黏贴刚剪切的内容</li>
+<li>Ctrl+/：替换</li>
+<li>Ctrl+F：向前移动一格光标</li>
+<li>Ctrl+B：向后移动一格光标</li>
+<li>Ctrl+P：向上移动一行</li>
+<li>Ctrl+N：向下移动一行</li>
+</ul>
+</li>
+</ul>
+<p>一般来说使用Ctrl+o和ctrl+X就可以打天下了。</p>
+<ul>
+<li>nano编辑器还可以通过加参数设置功能：以下是一些常用参数的描述：<ul>
+<li>-m ：激活鼠标。如果没有 -m 参数，那么鼠标在 nano 里是不起作用的，加了 -m 参数，鼠标可以通过点击来控制光标的位置；</li>
+<li>-i ：激活自动缩进的功能。这对于程序员写代码太有用了；</li>
+<li>-A ：激活智能 Home 键的功能。通常状况下，我们按下键盘的 Home 键，我们的光标会立即跳到一行的最开始，如果用了 -A 这个参数，那么按下 Home 键它会智能地判断，如果一行的开始处有缩进，那么它会使光标跳转到紧跟在缩进之后，而不是一行的最开始。</li>
+</ul>
+</li>
+</ul>
+<p>比如说，输入<code>nano -miA file1</code>就可以激活这三个功能了(在进入file1中编辑时)</p>
+<h2 id="学会阅读手册"><a href="#学会阅读手册" class="headerlink" title="学会阅读手册"></a>学会阅读手册</h2><p><strong>对某个命令不太清楚或者有很大好奇心了解的话就可以输入命令查看这个命令的使用手册。</strong></p>
+<p>1.man命令：这个命令时manual的缩写，表示为使用手册的意思，这个用来显示某个函数，某个命令等等的使用手册，很方便。以下是每个数字对于的不同手册类别：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">1 可执行程序或 Shell 命令；</span><br><span class="line">2 系统调用（Linux 内核提供的函数）；</span><br><span class="line">3 库调用（程序库中的函数）；</span><br><span class="line">4 文件（例如 &#x2F;etc&#x2F;passwd）；</span><br><span class="line">5 特殊文件（通常在 &#x2F;dev 下）；</span><br><span class="line">6 游戏；</span><br><span class="line">7 杂项（比如 man(7)，groff(7)）；</span><br><span class="line">8 系统管理命令（通常只能被 root 用户使用）；</span><br><span class="line">9 内核子程序。</span><br></pre></td></tr></table></figure>
+
+<p>当然，这个手册是在我们装系统的时候就默认安装的，但是不全，我们可以输入<code>sudo apt-get install manpages-de  manpages-de-dev  manpages-dev glibc-doc manpages-posix-dev manpages-posix</code>下载完备的手册。</p>
+<ul>
+<li>使用man命令：man+数字(指明手册类别)+某个命令或者函数，如果说没有加数字的话，系统就会默认从1号类别开始找。举个例子来说，假设输入了<code>man 3 rand</code> 这个就是指明了这个手册是库调用手册，专门查函数的，这个就是查rand函数的使用手册的，以下是前面的部分内容：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">RAND(3)                   Linux Programmer&#39;s Manual                   RAND(3)</span><br><span class="line"></span><br><span class="line">NAME</span><br><span class="line">       rand, rand_r, srand - pseudo-random number generator</span><br><span class="line"></span><br><span class="line">SYNOPSIS</span><br><span class="line">       #include &lt;stdlib.h&gt;</span><br><span class="line"></span><br><span class="line">       int rand(void);</span><br><span class="line"></span><br><span class="line">       int rand_r(unsigned int *seedp);</span><br><span class="line"></span><br><span class="line">       void srand(unsigned int seed);</span><br><span class="line"></span><br><span class="line">   Feature Test Macro Requirements for glibc (see feature_test_macros(7)):</span><br><span class="line"></span><br><span class="line">       rand_r():</span><br><span class="line">           Since glibc 2.24:</span><br><span class="line">               _POSIX_C_SOURCE &gt;&#x3D; 199506L</span><br><span class="line">           Glibc 2.23 and earlier</span><br><span class="line">               _POSIX_C_SOURCE</span><br><span class="line"></span><br><span class="line">DESCRIPTION</span><br><span class="line">       The  rand() function returns a pseudo-random integer in the range 0 to</span><br><span class="line">       RAND_MAX inclusive (i.e., the mathematical range [0, RAND_MAX]).</span><br><span class="line"></span><br><span class="line">....</span><br></pre></td></tr></table></figure>
+
+<p>还可以查询命令手册，比如说输入：<code>man cat</code> ,就会进入手册：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">CAT(1)                          User Commands                          CAT(1)</span><br><span class="line"></span><br><span class="line">NAME</span><br><span class="line">       cat - concatenate files and print on the standard output</span><br><span class="line"></span><br><span class="line">SYNOPSIS</span><br><span class="line">       cat [OPTION]... [FILE]...</span><br><span class="line"></span><br><span class="line">DESCRIPTION</span><br><span class="line">       Concatenate FILE(s) to standard output.</span><br><span class="line"></span><br><span class="line">       With no FILE, or when FILE is -, read standard input.</span><br><span class="line"></span><br><span class="line">       -A, --show-all</span><br><span class="line">              equivalent to -vET</span><br><span class="line"></span><br><span class="line">       -b, --number-nonblank</span><br><span class="line">              number nonempty output lines, overrides -n</span><br><span class="line"></span><br><span class="line">       -e     equivalent to -vE</span><br><span class="line"></span><br><span class="line">       -E, --show-ends</span><br><span class="line">              display $ at end of each line</span><br><span class="line"></span><br><span class="line">       -n, --number</span><br><span class="line">              number all output lines</span><br><span class="line">....(后面还有很多)</span><br></pre></td></tr></table></figure>
+
+<p>进入手册以后，按向上键和向下键可以实现上一行和下一行的跳转，按空格键可以实现页的跳转，按q键可以退出手册。</p>
+<p>当然大家还会好奇，手册里面看不懂，每部分内容又是什么，如何去看，大家看看下面的关于手册内容的总结：</p>
+<ul>
+<li>NAME ：英语“名字”的意思。手册页对应的命令或函数名字，后接简单描述；</li>
+<li>SYNOPSIS ：英语“概要，梗概，大意，摘要”的意思。使用此命令的所有方法。下面我们会详述这个区域，因为此区域的内容极为关键；</li>
+<li>DESCRIPTION ：英语“描述”的意思。命令的更深入的描述，这个区域也会包括所有参数及其用法。一般来说这个区域是文字最多的；</li>
+<li>AUTHOR ：英语“作者”的意思。命令的作者，有时候不止一个作者；</li>
+<li>REPORTING BUGS ：英语“报告故障”的意思。如果使用时遇到 bug（程序的缺陷），有汇报问题的联系方式，通常是邮件；</li>
+<li>COPYRIGHT ：英语“版权”的意思。版权，也就是用了什么许可证（Licence），大多数命令都是在 GPL 许可证之下的开源代码；</li>
+<li>SEE ALSO ：英语“另见”的意思。与此命令有关的其它命令，也就是扩展阅读。</li>
+</ul>
+<p><strong>(前三个才是最重要的)</strong></p>
+<ul>
+<li>看看最重要的SYNOPSIS区域：</li>
+</ul>
+<p>输入<code>man ls</code>看看:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">SYNOPSIS</span><br><span class="line">       ls [OPTION]... [FILE]...</span><br></pre></td></tr></table></figure>
+
+<p>其中，在终端中，ls是粗体的，[OPTION]和[FILE]是有下划线的，前者代表这个命令是必须原封不动输入的，后者则根据实际可以输入相应的内容。</p>
+<ul>
+<li>mkdir ：使用 mkdir 命令，我们当然必须先输入mkdir，这是很好理解的；</li>
+<li>[OPTION] ：option 是英语“选项”的意思，表示在 ls 之后，我们可以加选项参数（就是 -a，-l 之类）。在 SYNOPSIS 区域中，中括号中的内容表示可选，所以我们并不一定要添加选项参数；</li>
+<li>FILE ：FILE 是英语“文件”的意思。就是需要用 ls 命令查看的目录或者文件。这个参数是必须的，因为并没有用中括号括起来。这也不难理解，最少输入一个文件名或者目录名；</li>
+<li>… ：省略号表示可以有多个此类内容。在 [OPTION] 和 DIRECTORY 后都有省略号，分别表示可以有多个选项和多个目录名或者文件名，可以同时输入多个。</li>
+</ul>
+<p>当然，还可以通过输入某个目录+h/help来查看手册帮助。</p>
+<h2 id="查找文件"><a href="#查找文件" class="headerlink" title="查找文件"></a>查找文件</h2><p><strong>1.locate命令快速查找文件：</strong> 这个命令后面直接接文件名或者目录名即可，输入完以后，终端会打印出所有含有该文件名的文件的路径，举例如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">liujunchi@ubuntu:~&#x2F;new_file1&#x2F;new_file$ locate new_file</span><br><span class="line">&#x2F;home&#x2F;liujunchi&#x2F;new_file</span><br><span class="line">&#x2F;home&#x2F;liujunchi&#x2F;new_file1</span><br><span class="line">&#x2F;home&#x2F;liujunchi&#x2F;new_file1&#x2F;file2</span><br><span class="line">&#x2F;home&#x2F;liujunchi&#x2F;new_file1&#x2F;file3</span><br><span class="line">&#x2F;home&#x2F;liujunchi&#x2F;new_file1&#x2F;new_file</span><br><span class="line">&#x2F;home&#x2F;liujunchi&#x2F;rename&#x2F;new_file1</span><br><span class="line">&#x2F;home&#x2F;liujunchi&#x2F;rename&#x2F;new_fi&#x2F;new_file1</span><br></pre></td></tr></table></figure>
+
+<p>但是这个只能够用于快速查找，而且这个查找是在文件数据库里面查找，文件数据库之外的文件查找不到，比如说我现在创建了一个file1的文件，但是我马上查找的时候，发现查找不到这个文件，那是因为这个文件刚刚创建，没有进入到文件数据库里面，因此无法查找，这也是这个命令的一个缺点，不过还是够用的：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">liujunchi@ubuntu:~&#x2F;new_file1&#x2F;new_file$ touch 11111</span><br><span class="line">liujunchi@ubuntu:~&#x2F;new_file1&#x2F;new_file$ ls</span><br><span class="line">1  11111  2  test  test111.txt</span><br><span class="line">liujunchi@ubuntu:~&#x2F;new_file1&#x2F;new_file$ locate 11111</span><br><span class="line">liujunchi@ubuntu:~&#x2F;new_file1&#x2F;new_file$ </span><br><span class="line">输入locate以后没有出现路径，说明没查找到这个文件</span><br></pre></td></tr></table></figure>
+
+<p>2.find命令深入查找：这个命令就不像上面那个，不是在文件数据库里面查找，而是在整个硬盘里面查找，如果硬盘容量比较大的话，那么就会遍历一段时间了。</p>
+<ul>
+<li>根据名字查找(需要name参数)：不管什么参数，都可以指定在某个目录下查找，如果说没有指定，那么真的就是全局硬盘查找了。输入：<code>find -name &quot;文件名字&quot;</code> 这个就会在当前目录以及子目录中查看某个文件了，输入<code>find directory -name &quot;文件名&quot;</code> 这个就可以指定在directory目录里面查找这个文件名对应的文件路径了。</li>
+<li>根据文件大小查找(需要size参数)：也可以指定目录，需要接size参数，后面还得加上文件大小,比如说：<code>find -size 10M</code> 这个就会在当前目录以及子目录中查找大小为10M的文件了，再比如：<code>find 1/2 -size +10M</code>，这个就可以在1/2目录下查找文件大小大于10M的文件了，-10M就是小于10M了。</li>
+<li>根据最近访问时间查找(需要atime参数)：比如说输入<code>find -atime 10</code> 就是表示查找访问时间在10天的文件，如果-10就是十天内，+10就是10天前。</li>
+<li>可以指定查找目录或者文件(需要type)：<ul>
+<li>-type d ：只查找目录类型。d 是 directory 的首字母，表示“目录”；</li>
+<li>-type f ：只查找文件类型。f 是 file 的首字母，表示“文件”。</li>
+</ul>
+</li>
+</ul>
+<p>比如说输入<code>find /home/liujunchi -name &quot;new_file&quot; -type d</code> 可以查找new_file的目录了，当然，如果出现了Permission denied，可以在命令前面加上sudo，用管理页模式查找。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">liujunchi@ubuntu:~&#x2F;new_file1&#x2F;new_file$ sudo find &#x2F;home&#x2F;liujunchi -name new_file[sudo] password for liujunchi: </span><br><span class="line">&#x2F;home&#x2F;liujunchi&#x2F;new_file</span><br><span class="line">&#x2F;home&#x2F;liujunchi&#x2F;new_file1&#x2F;new_file</span><br><span class="line">liujunchi@ubuntu:~&#x2F;new_file1&#x2F;new_file$ sudo find &#x2F;home&#x2F;liujunchi -name new_file type -d</span><br><span class="line">find: paths must precede expression: &#96;type&#39;</span><br><span class="line">liujunchi@ubuntu:~&#x2F;new_file1&#x2F;new_file$ sudo find &#x2F;home&#x2F;liujunchi -name new_file -type d</span><br><span class="line">&#x2F;home&#x2F;liujunchi&#x2F;new_file1&#x2F;new_file</span><br></pre></td></tr></table></figure>
+
+<h1 id="博主寄语"><a href="#博主寄语" class="headerlink" title="博主寄语"></a>博主寄语</h1><p>这一部分的讲解到此完毕，这是本Linux操作系统从入门到实战的第二课时，主要是讲了各种文件操作命令以及编辑器的使用，终端的介绍，当然这些都只是基础的，后面，博主还会进一步讲解高级一点的，Linux操作系统的学习和使用还是比较有趣的，希望大家能够从中获得收获，如果觉得看完有收获的，可以帮博主转发一下，博主会十分感激的，感激地后面会写的更加好，激励博主一直坚持写作下去。<strong>总之这个世界很美好，那么就从发现Linux操作系统开始吧！！！</strong></p>
+<p>相关文章：</p>
+<p><a href="https://liujunchi-bot.github.io/2020/02/29/Linux1/#more">Linux操作系统入门到实战(一)：第一行代码</a></p>
+</article><!-- lincense--><div class="license-wrapper"><p> <span>Author:  </span><a href="http://liujunchi-bot.github.io">John Doe</a></p><p> <span>Link:  </span><a href="http://liujunchi-bot.github.io/2020/03/04/Linux2/">http://liujunchi-bot.github.io/2020/03/04/Linux2/</a></p><p> <span>Copyright:  </span><span>All articles in this blog are licensed under <a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-nd/3.0" target="_blank">CC BY-NC-SA 3.0</a> unless stating additionally.</span></p></div><div class="post-paginator"><a class="nextSlogan" href="/2020/02/29/Linux1/" title="Linux操作系统入门到实战(一)：第一行代码"><span>NextPost ></span><br><span class="nextTitle">Linux操作系统入门到实战(一)：第一行代码</span></a><div class="clear"></div></div><div id="comment"><div id="container"></div><link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css"><script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script><script>var gitment = new Gitment({
+  //- id: 'Linux操作系统入门到实战(二)：探秘文件',
+  //- owner: 'liujunchi-bot',
+  //- repo: 'Blog-Comment',
+  //- oauth: {
+  //-   client_id: 'fcc11412ea5eb9310de3',
+  //-   client_secret: 'fb83a32085e0e8570fd37c38d4909a2436776fde',
+  //- },
+  id: '{% raw %}{{ page.date }}{% endraw %}',
+  owner: 'liujunchi-bot',
+  repo: 'Blog-Comment',
+  oauth: {
+    client_id: 'fcc11412ea5eb9310de3',
+    client_secret: 'fb83a32085e0e8570fd37c38d4909a2436776fde',
+  },
+})
+gitment.render('container')</script></div></section></article><footer id="cxo-footer-outer"><div id="cxo-footer-inner"><p class="footer-container"><span>Site by </span><a href="http://hexo.io" target="_blank" rel="noopener"><span>Hexo</span></a><span> | theme </span><a href="https://github.com/Longlongyu/hexo-theme-Cxo" target="_blank" rel="noopener"><span>Cxo</span></a></p><i class="fa fa-user"> </i><span id="busuanzi_value_site_uv"></span><span> | </span><i class="fa fa-eye"> </i><span id="busuanzi_value_site_pv"></span></div></footer><!-- catelog--><div class="toc-wrapper" style="top: 70vh;"><div class="toc-catalog"><i class="fa fa-list"> </i><span>CATALOG</span></div><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#从终端开始说起"><span class="toc-number">1.</span> <span class="toc-text">从终端开始说起</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#概述"><span class="toc-number">1.1.</span> <span class="toc-text">概述</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#为什么要终端"><span class="toc-number">1.2.</span> <span class="toc-text">为什么要终端</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#两种终端"><span class="toc-number">1.3.</span> <span class="toc-text">两种终端</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#图形终端的两种模式"><span class="toc-number">1.4.</span> <span class="toc-text">图形终端的两种模式</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#基本的文件操作命令"><span class="toc-number">2.</span> <span class="toc-text">基本的文件操作命令</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#命令参数"><span class="toc-number">2.1.</span> <span class="toc-text">命令参数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#查找命令和历史记录"><span class="toc-number">2.2.</span> <span class="toc-text">查找命令和历史记录</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#文件的组织"><span class="toc-number">2.3.</span> <span class="toc-text">文件的组织</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#目录命令"><span class="toc-number">2.4.</span> <span class="toc-text">目录命令</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#浏览与创建文件"><span class="toc-number">2.5.</span> <span class="toc-text">浏览与创建文件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#复制删除移动链接文件"><span class="toc-number">2.6.</span> <span class="toc-text">复制删除移动链接文件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#探秘用户和群组"><span class="toc-number">2.7.</span> <span class="toc-text">探秘用户和群组</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#文件权限管理"><span class="toc-number">2.8.</span> <span class="toc-text">文件权限管理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#nano编辑器"><span class="toc-number">2.9.</span> <span class="toc-text">nano编辑器</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#学会阅读手册"><span class="toc-number">2.10.</span> <span class="toc-text">学会阅读手册</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#查找文件"><span class="toc-number">2.11.</span> <span class="toc-text">查找文件</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#博主寄语"><span class="toc-number">3.</span> <span class="toc-text">博主寄语</span></a></li></ol></div><!-- top--><i class="fa fa-arrow-up close" id="go-up" aria-hidden="true"></i></body></html>
